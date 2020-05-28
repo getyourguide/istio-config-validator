@@ -1,3 +1,5 @@
+// Package parser is the package responsible for parsing test cases and istio configuration
+// to be use on test assertion
 package parser
 
 import (
@@ -74,9 +76,7 @@ func parseTestCases(rootDir string) ([]*TestCase, error) {
 					return err
 				}
 
-				for _, testCase := range yamlFile.TestCases {
-					out = append(out, testCase)
-				}
+				out = append(out, yamlFile.TestCases...)
 			}
 
 			return nil

@@ -7,7 +7,7 @@ import (
 func TestParseTestCases(t *testing.T) {
 	expectedTestCases := []*TestCase{
 		{Description: "happy path users"},
-		{Description: "Partner service only accepts GET and OPTIONS"},
+		{Description: "Partner service only accepts GET or OPTIONS"},
 	}
 	configuration := &Configuration{
 		RootDir: "../../../examples/",
