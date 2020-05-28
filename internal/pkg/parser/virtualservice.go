@@ -43,7 +43,6 @@ func parseVirtualServices(rootDir string) ([]*v1alpha3.VirtualService, error) {
 
 			return nil
 		})
-
 	if err != nil {
 		return nil, err
 	}

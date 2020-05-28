@@ -28,5 +28,4 @@ func TestParseVirtualServices(t *testing.T) {
 			assert.ElementsMatch(t, expected.Spec.Hosts, out.Spec.Hosts)
 		}
 	}
-
 }
