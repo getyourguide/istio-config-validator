@@ -1,0 +1,49 @@
+name: Go
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [1.12.x, 1.13.x, 1.14.x]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Environment information
+      run: |
+        uname -a
+        go version
+        go env
+    - name: Vet
+      if: matrix.platform == 'ubuntu-latest'
+      run: go vet -v ./...
+    - name: Lint
+      if: matrix.platform == 'ubuntu-latest'
+      run: |
+        export PATH=$PATH:$(go env GOPATH)/bin
+        go get -u golang.org/x/lint/golint
+        golint -set_exit_status ./...
+    - name: staticcheck.io
+      if: matrix.platform == 'ubuntu-latest'
+      run: |
+        export PATH=$PATH:$(go env GOPATH)/bin
+        go get honnef.co/go/tools/cmd/staticcheck
+        staticcheck -checks all ./...
+    - name: gofumports formatting
+      if: matrix.platform == 'ubuntu-latest'
+      run: |
+        export PATH=$PATH:$(go env GOPATH)/bin
+        go get mvdan.cc/gofumpt/gofumports
+        gofumports -d .
+        [ -z "$(gofumports -l .)" ]
+    - name: Test
+      run: go test -count=1 ./...
+    - name: Test with -race
+      run: go test -race -count=1 ./...
