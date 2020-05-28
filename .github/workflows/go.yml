@@ -16,7 +16,7 @@ jobs:
         go-version: ${{ matrix.go-version }}
     - name: Checkout code
       uses: actions/checkout@v1
-    -name: Environment information
+    - name: Environment information
       run: |
         uname -a
         go version
