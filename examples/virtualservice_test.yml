@@ -1,4 +1,4 @@
-TestCases:
+testCases:
   - description: happy path users
     request:
       authority: ["www.example.com", "getyourguide.com"]
