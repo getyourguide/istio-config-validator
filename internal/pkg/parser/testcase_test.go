@@ -12,17 +12,17 @@ func TestParseTestCases(t *testing.T) {
 	configuration := &Configuration{
 		RootDir: "../../../examples/",
 	}
-	outTestCases, err := New(configuration)
+	parser, err := New(configuration)
 	if err != nil {
 		t.Errorf("error getting test cases %v", err)
 	}
-	if len(outTestCases) == 0 {
+	if len(parser.TestCases) == 0 {
 		t.Error("test cases are empty")
 	}
 
 	for _, expected := range expectedTestCases {
 		testPass := false
-		for _, out := range outTestCases {
+		for _, out := range parser.TestCases {
 			if expected.Description == out.Description {
 				testPass = true
 			}
