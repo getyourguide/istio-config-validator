@@ -81,7 +81,6 @@ func parseTestCases(rootDir string) ([]*TestCase, error) {
 
 			return nil
 		})
-
 	if err != nil {
 		return nil, err
 	}
