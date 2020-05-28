@@ -23,4 +23,4 @@ TODO
 
 Compilation and building is handled in the Docker container:
 - checkout the git repo
-- in the repo folder, run `docker build -t istio-config-validator:latest`
+- in the repo folder, run `docker build -t istio-config-validator:latest .`
