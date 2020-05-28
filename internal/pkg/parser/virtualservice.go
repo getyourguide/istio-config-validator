@@ -1,15 +1,16 @@
 package parser
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"gopkg.in/yaml.v2"
+	"github.com/ghodss/yaml"
+
 	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
 )
 
-// FIXME: Unmarshal doesn't parse the whole structure. istio/client-go seems to only parse `spec`.
 func parseVirtualServices(rootDir string) ([]*v1alpha3.VirtualService, error) {
 	out := []*v1alpha3.VirtualService{}
 	err := filepath.Walk(rootDir,
@@ -22,20 +23,24 @@ func parseVirtualServices(rootDir string) ([]*v1alpha3.VirtualService, error) {
 				return nil
 			}
 
-			virtualService := &v1alpha3.VirtualService{}
 			fileContet, err := ioutil.ReadFile(path)
 			if err != nil {
 				return err
 			}
 
-			err = yaml.Unmarshal(fileContet, virtualService)
+			// we need to transform yaml to json so the marsheler from istio works
+			jsonBytes, err := yaml.YAMLToJSON(fileContet)
 			if err != nil {
 				return err
 			}
 
-			// As we don't have the whole struct filled this is the way found to check if a
-			// file is a virtualservice.
-			if len(virtualService.Spec.Hosts) == 0 {
+			virtualService := &v1alpha3.VirtualService{}
+			err = json.Unmarshal(jsonBytes, virtualService)
+			if err != nil {
+				return err
+			}
+
+			if virtualService.Name == "" {
 				return nil
 			}
 
