@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: example
+  namespace: example
+spec:
+  gateways:
+    - mesh
+  hosts:
+    - www.example.com
+    - example.com
+  http:
+    - match:
+        - uri:
+            regex: /users(/.*)?
+      route:
+        - destination:
+            host: users.users.svc.cluster.local
+            port:
+              number: 80
+    - match:
+        - uri:
+            prefix: /partners
+          method:
+            regex: (GET|OPTIONS)
+      route:
+        - destination:
+            host: partner.partner.svc.cluster.local
+            port:
+              number: 8000
+    - route:
+        - destination:
+            host: monolith.monolith.svc.cluster.local
