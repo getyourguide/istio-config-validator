@@ -2,6 +2,8 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseTestCases(t *testing.T) {
@@ -32,4 +34,34 @@ func TestParseTestCases(t *testing.T) {
 		}
 
 	}
+}
+
+func TestUnfoldRequest(t *testing.T) {
+	testCases := []struct {
+		In  Request
+		Out []Input
+	}{{
+		Request{
+			Authority: []string{"www.example.com", "example.com"},
+			Method:    []string{"GET", "OPTIONS"},
+		},
+		[]Input{{
+			Authority: "www.example.com",
+			Method:    "GET",
+		}, {
+			Authority: "www.example.com",
+			Method:    "OPTIONS",
+		}, {
+			Authority: "example.com",
+			Method:    "GET",
+		}, {
+			Authority: "example.com",
+			Method:    "OPTIONS",
+		}},
+	}}
+
+	for _, testCase := range testCases {
+		assert.ElementsMatch(t, testCase.Out, testCase.In.Unfold())
+	}
+
 }

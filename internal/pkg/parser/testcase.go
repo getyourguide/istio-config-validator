@@ -20,12 +20,20 @@ type TestCase struct {
 	Destination *Destination `yaml:"destination"`
 }
 
-// Request define the crafted http request to be used as input for the test case
+// Request define the crafted http request present in the test case file.
 type Request struct {
 	Authority []string          `yaml:"authority"`
 	Method    []string          `yaml:"method"`
 	URI       []string          `yaml:"uri"`
 	Headers   map[string]string `yaml:"headers"`
+}
+
+// Input contains the data structure which will be used to assert
+type Input struct {
+	Authority string
+	Method    string
+	URI       string
+	Headers   map[string]string
 }
 
 // Destination define the destination we should assert
@@ -37,6 +45,20 @@ type Destination struct {
 // Port define the port of a given Destination
 type Port struct {
 	Number int16 `yaml:"number"`
+}
+
+// Unfold returns a list of Input objects constructed by all possibilities defined in the Request object. Ex:
+// Request{Authority: {"www.example.com", "example.com"}, Method: {"GET", "OPTIONS"}}
+// returns []Input{
+// 	{Authority:"www.example.com", Method: "GET"},
+// 	{Authority:"www.example.com", Method: "OPTIONS"}
+// 	{Authority:"example.com", Method: "GET"},
+// 	{Authority:"example.com", Method: "OPTIONS"},
+// }
+func (r *Request) Unfold() []Input {
+	out := []Input{}
+
+	return out
 }
 
 func parseTestCases(rootDir string) ([]*TestCase, error) {
