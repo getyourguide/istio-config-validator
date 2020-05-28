@@ -10,7 +10,7 @@ TestCases:
       host: users.users.svc.cluster.local
       port:
         number: 80
-  - description: Partner service only accepts GET and OPTIONS
+  - description: Partner service only accepts GET or OPTIONS
     request:
       authority: ["example.com"]
       method: ["PUT", "POST", "PATCH"]
