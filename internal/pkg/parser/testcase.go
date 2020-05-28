@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -10,9 +10,12 @@ import (
 )
 
 var (
-	ErrEmptyAuthorityList = fmt.Errorf("authority list is empty")
-	ErrEmptyMethodList    = fmt.Errorf("method list is empty")
-	ErrEmptyURIList       = fmt.Errorf("URI list is empty")
+	// ErrEmptyAuthorityList indicates an empty Authority list
+	ErrEmptyAuthorityList = errors.New("authority list is empty")
+	// ErrEmptyMethodList indicates an empty Method list
+	ErrEmptyMethodList = errors.New("method list is empty")
+	// ErrEmptyURIList indicates an empty URI list
+	ErrEmptyURIList = errors.New("URI list is empty")
 )
 
 // TestCaseYAML define the list of TestCase
