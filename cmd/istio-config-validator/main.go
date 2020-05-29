@@ -44,11 +44,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	parser, err := parser.New(testCaseFiles, istioConfigFiles)
+	p, err := parser.New(testCaseFiles, istioConfigFiles)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("parser: %#v\n", parser)
+	fmt.Printf("parser: %#v\n", p)
 }
 
 func getFiles(names []string) []string {
