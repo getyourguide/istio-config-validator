@@ -1,3 +1,6 @@
+// Package unit contains logic to run the unit tests against istio configuration.
+// It intends to replicates istio logic when it comes to matching requests and defining its destinations.
+// Once the destinations are found for a given test case, it will try to assert with the expected results.
 package unit
 
 import (
@@ -32,7 +35,7 @@ func Run(testfiles, configfiles []string) error {
 		for _, input := range inputs {
 			destinations := GetDestination(input, parsed.VirtualServices)
 			if reflect.DeepEqual(destinations, testCase.Route) != testCase.WantMatch {
-				return fmt.Errorf("Destination missmatch=%v, want %v", destinations, testCase.Route)
+				return fmt.Errorf("destination missmatch=%v, want %v", destinations, testCase.Route)
 			}
 
 			log.Infof("PASS input:[%v]", input)
