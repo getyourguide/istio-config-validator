@@ -12,10 +12,9 @@ func TestParseVirtualServices(t *testing.T) {
 	expectedTestCases := []*v1alpha3.VirtualService{{Spec: networkingv1alpha3.VirtualService{
 		Hosts: []string{"www.example.com", "example.com"},
 	}}}
-	configuration := &Configuration{
-		RootDir: "../../../examples/",
-	}
-	parser, err := New(configuration)
+	testcasefiles := []string{"../../../examples/virtualservice_test.yml"}
+	configfiles := []string{"../../../examples/virtualservice.yml"}
+	parser, err := New(testcasefiles, configfiles)
 	if err != nil {
 		t.Errorf("error getting test cases %v", err)
 	}

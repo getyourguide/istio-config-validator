@@ -11,10 +11,9 @@ func TestParseTestCases(t *testing.T) {
 		{Description: "happy path users"},
 		{Description: "Partner service only accepts GET or OPTIONS"},
 	}
-	configuration := &Configuration{
-		RootDir: "../../../examples/",
-	}
-	parser, err := New(configuration)
+	testcasefiles := []string{"../../../examples/virtualservice_test.yml"}
+	configfiles := []string{"../../../examples/virtualservice.yml"}
+	parser, err := New(testcasefiles, configfiles)
 	if err != nil {
 		t.Errorf("error getting test cases %v", err)
 	}
