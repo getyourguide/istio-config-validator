@@ -1,11 +1,21 @@
 package parser
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"gopkg.in/yaml.v2"
+)
+
+var (
+	// ErrEmptyAuthorityList indicates an empty Authority list
+	ErrEmptyAuthorityList = errors.New("authority list is empty")
+	// ErrEmptyMethodList indicates an empty Method list
+	ErrEmptyMethodList = errors.New("method list is empty")
+	// ErrEmptyURIList indicates an empty URI list
+	ErrEmptyURIList = errors.New("URI list is empty")
 )
 
 // TestCaseYAML define the list of TestCase
@@ -55,10 +65,28 @@ type Port struct {
 // 	{Authority:"example.com", Method: "GET"},
 // 	{Authority:"example.com", Method: "OPTIONS"},
 // }
-func (r *Request) Unfold() []Input {
+func (r *Request) Unfold() ([]Input, error) {
 	out := []Input{}
 
-	return out
+	if len(r.Authority) == 0 {
+		return out, ErrEmptyAuthorityList
+	}
+	if len(r.Method) == 0 {
+		return out, ErrEmptyMethodList
+	}
+	if len(r.URI) == 0 {
+		return out, ErrEmptyURIList
+	}
+
+	for _, auth := range r.Authority {
+		for _, method := range r.Method {
+			for _, uri := range r.URI {
+				out = append(out, Input{Authority: auth, Method: method, URI: uri, Headers: r.Headers})
+			}
+		}
+	}
+
+	return out, nil
 }
 
 func parseTestCases(rootDir string) ([]*TestCase, error) {

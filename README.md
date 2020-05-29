@@ -5,7 +5,7 @@
 ## Installation
 Either install the go package
 ```
-# go get -u github.com/getyourguide/istio-config-validator
+# go get -u github.com/getyourguide/istio-config-validator/cmd/istio-config-validator
 ```
 Or alternatively install the docker image
 ```
