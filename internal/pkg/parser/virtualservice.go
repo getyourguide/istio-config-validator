@@ -3,53 +3,39 @@ package parser
 import (
 	"encoding/json"
 	"io/ioutil"
-	"os"
-	"path/filepath"
 
 	"github.com/ghodss/yaml"
 
 	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
 )
 
-func parseVirtualServices(rootDir string) ([]*v1alpha3.VirtualService, error) {
+func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 	out := []*v1alpha3.VirtualService{}
-	err := filepath.Walk(rootDir,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
 
-			if info.IsDir() {
-				return nil
-			}
+	for _, file := range files {
+		fileContet, err := ioutil.ReadFile(file)
+		if err != nil {
+			return []*v1alpha3.VirtualService{}, err
+		}
 
-			fileContet, err := ioutil.ReadFile(path)
-			if err != nil {
-				return err
-			}
+		// we need to transform yaml to json so the marsheler from istio works
+		jsonBytes, err := yaml.YAMLToJSON(fileContet)
+		if err != nil {
+			return []*v1alpha3.VirtualService{}, err
+		}
 
-			// we need to transform yaml to json so the marsheler from istio works
-			jsonBytes, err := yaml.YAMLToJSON(fileContet)
-			if err != nil {
-				return err
-			}
+		virtualService := &v1alpha3.VirtualService{}
+		err = json.Unmarshal(jsonBytes, virtualService)
+		if err != nil {
+			return []*v1alpha3.VirtualService{}, err
+		}
 
-			virtualService := &v1alpha3.VirtualService{}
-			err = json.Unmarshal(jsonBytes, virtualService)
-			if err != nil {
-				return err
-			}
+		if virtualService.Name == "" {
+			continue
+		}
 
-			if virtualService.Name == "" {
-				return nil
-			}
-
-			out = append(out, virtualService)
-
-			return nil
-		})
-	if err != nil {
-		return nil, err
+		out = append(out, virtualService)
 	}
+
 	return out, nil
 }

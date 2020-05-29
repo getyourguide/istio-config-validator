@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"os"
-	"path/filepath"
 
 	"github.com/ghodss/yaml"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
@@ -92,45 +90,32 @@ func (r *Request) Unfold() ([]Input, error) {
 	return out, nil
 }
 
-func parseTestCases(rootDir string) ([]*TestCase, error) {
+func parseTestCases(files []string) ([]*TestCase, error) {
 	out := []*TestCase{}
-	err := filepath.Walk(rootDir,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
 
-			if info.IsDir() {
-				return nil
-			}
+	for _, file := range files {
+		fileContet, err := ioutil.ReadFile(file)
+		if err != nil {
+			return []*TestCase{}, err
+		}
 
-			fileContet, err := ioutil.ReadFile(path)
-			if err != nil {
-				return err
-			}
+		// we need to transform yaml to json so the marsheler from istio works
+		jsonBytes, err := yaml.YAMLToJSON(fileContet)
+		if err != nil {
+			return []*TestCase{}, err
+		}
 
-			// we need to transform yaml to json so the marsheler from istio works
-			jsonBytes, err := yaml.YAMLToJSON(fileContet)
-			if err != nil {
-				return err
-			}
+		yamlFile := &TestCaseYAML{}
+		err = json.Unmarshal(jsonBytes, yamlFile)
+		if err != nil {
+			return []*TestCase{}, err
+		}
 
-			yamlFile := &TestCaseYAML{}
-			err = json.Unmarshal(jsonBytes, yamlFile)
-			if err != nil {
-				return err
-			}
+		if len(yamlFile.TestCases) == 0 {
+			continue
+		}
 
-			if len(yamlFile.TestCases) == 0 {
-				return nil
-			}
-
-			out = append(out, yamlFile.TestCases...)
-
-			return nil
-		})
-	if err != nil {
-		return nil, err
+		out = append(out, yamlFile.TestCases...)
 	}
 	return out, nil
 }
