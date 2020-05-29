@@ -7,18 +7,6 @@ import (
 	"istio.io/api/networking/v1alpha3"
 )
 
-func Test_Something(t *testing.T) {
-	httpMatchRequest := &v1alpha3.HTTPMatchRequest{
-		Uri: &v1alpha3.StringMatch{
-			MatchType: &v1alpha3.StringMatch_Exact{
-				Exact: "/",
-			},
-		},
-	}
-	input := parser.Input{Authority: "www.example.com", URI: "/"}
-	matchRequest(input, httpMatchRequest)
-}
-
 func Test_matchRequest(t *testing.T) {
 	type args struct {
 		input            parser.Input
@@ -123,6 +111,62 @@ func Test_matchRequest(t *testing.T) {
 					MatchType: &v1alpha3.StringMatch_Exact{
 						Exact: "GET",
 					}}}},
+		want: false,
+	}, {
+		name: "multiple match in headers, regex, prefix, exact (true)",
+		args: args{
+			input: parser.Input{Authority: "www.example.com", URI: "/", Method: "GET", Headers: map[string]string{
+				"x-header-exact":  "exact",
+				"x-header-prefix": "prefix-something",
+				"x-header-regex":  "capture-this-regex",
+			}},
+			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
+				Authority: &v1alpha3.StringMatch{
+					MatchType: &v1alpha3.StringMatch_Regex{
+						Regex: "(www.)example.com",
+					}},
+				Headers: map[string]*v1alpha3.StringMatch{
+					"x-header-prefix": {
+						MatchType: &v1alpha3.StringMatch_Prefix{
+							Prefix: "prefix-",
+						}},
+					"x-header-exact": {
+						MatchType: &v1alpha3.StringMatch_Exact{
+							Exact: "exact",
+						}},
+					"x-header-regex": {
+						MatchType: &v1alpha3.StringMatch_Regex{
+							Regex: ".+?-this-.+?",
+						}}},
+			}},
+		want: true,
+	}, {
+		name: "multiple match in headers, regex, prefix, exact (false)",
+		args: args{
+			input: parser.Input{Authority: "www.example.com", URI: "/", Method: "GET", Headers: map[string]string{
+				"x-header-exact":  "exact",
+				"x-header-prefix": "prefix-something",
+				"x-header-regex":  "capture-this-regex",
+			}},
+			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
+				Authority: &v1alpha3.StringMatch{
+					MatchType: &v1alpha3.StringMatch_Regex{
+						Regex: "(www.)example.com",
+					}},
+				Headers: map[string]*v1alpha3.StringMatch{
+					"x-header-prefix": {
+						MatchType: &v1alpha3.StringMatch_Prefix{
+							Prefix: "not-prefix-",
+						}},
+					"x-header-exact": {
+						MatchType: &v1alpha3.StringMatch_Exact{
+							Exact: "exact",
+						}},
+					"x-header-regex": {
+						MatchType: &v1alpha3.StringMatch_Regex{
+							Regex: ".+?-this-.+?",
+						}}},
+			}},
 		want: false,
 	}}
 
