@@ -31,13 +31,6 @@ func Run(configuration *Configuration) error {
 }
 
 func inputMatch(input parser.Input, virtualServices []*v1alpha3.VirtualService) bool {
-	// for _, vs := range virtualServices {
-	// 	d, err := vs.Unmarshal()
-	// 	if err != nil {
-	// 		log.Fatalf("error: %v", err)
-	// 	}
-	// 	fmt.Printf("--- m dump:\n%s\n\n", string(d))
-	// }
 
 	return true
 }
