@@ -55,6 +55,9 @@ func getFiles(names []string) []string {
 	var files []string
 	for _, name := range names {
 		filepath.Walk(name, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				log.Fatal(err.Error())
+			}
 			if !info.IsDir() {
 				files = append(files, path)
 			}
