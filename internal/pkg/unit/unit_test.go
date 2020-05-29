@@ -10,11 +10,10 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	configuration := &Configuration{
-		RootDir: "../../../examples/",
-	}
+	testcasefiles := []string{"../../../examples/virtualservice_test.yml"}
+	configfiles := []string{"../../../examples/virtualservice.yml"}
 
-	err := Run(configuration)
+	err := Run(testcasefiles, configfiles)
 	if err != nil {
 		t.Error(err)
 	}

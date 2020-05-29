@@ -16,11 +16,9 @@ type Configuration struct {
 }
 
 // Run is the entrypoint to run all unit tests defined in test cases
-func Run(configuration *Configuration) error {
-	c := &parser.Configuration{
-		RootDir: configuration.RootDir,
-	}
-	parsed, err := parser.New(c)
+func Run(testfiles, configfiles []string) error {
+
+	parsed, err := parser.New(testfiles, configfiles)
 	if err != nil {
 		return err
 	}
@@ -39,6 +37,7 @@ func Run(configuration *Configuration) error {
 
 			log.Infof("PASS input:[%v]", input)
 		}
+		fmt.Print("===========================\n")
 	}
 	return nil
 }
