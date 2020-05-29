@@ -37,7 +37,7 @@ func Run(configuration *Configuration) error {
 				return fmt.Errorf("Destination missmatch=%v, want %v", destinations, testCase.Route)
 			}
 
-			log.Infof("input:[%v] PASS", input)
+			log.Infof("PASS input:[%v]", input)
 		}
 	}
 	return nil
