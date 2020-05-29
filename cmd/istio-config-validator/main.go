@@ -3,9 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
 )
 
 type multiValueFlag []string
@@ -41,15 +44,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	// TODO: instead of printing out the file names, call the parsing&validation functions
-	fmt.Println("Received the following test case files/folders:")
-	for _, file := range testCaseFiles {
-		fmt.Println(file)
+	parser, err := parser.New(testCaseFiles, istioConfigFiles)
+	if err != nil {
+		log.Fatal(err)
 	}
-	fmt.Println("Received the following istio config files/folders:")
-	for _, file := range istioConfigFiles {
-		fmt.Println(file)
-	}
+	fmt.Printf("parser: %#v\n", parser)
 }
 
 func getFiles(names []string) []string {
