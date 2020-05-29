@@ -4,29 +4,24 @@ package parser
 
 import v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
 
-// Configuration needed to build test cases
-type Configuration struct {
-	RootDir string
-}
-
-// Parsed contains the parsed files needed to run tests
-type Parsed struct {
+// Parser contains the parsed files needed to run tests
+type Parser struct {
 	TestCases       []*TestCase
 	VirtualServices []*v1alpha3.VirtualService
 }
 
-// New returns the list of test cases for a given configuration
-func New(configuration *Configuration) (*Parsed, error) {
-	testCases, err := parseTestCases(configuration.RootDir)
+// New parses and loads the testcases and istio configuration files
+func New(testfiles, configfiles []string) (*Parser, error) {
+	testCases, err := parseTestCases(testfiles)
 	if err != nil {
 		return nil, err
 	}
 
-	virtualServices, err := parseVirtualServices(configuration.RootDir)
+	virtualServices, err := parseVirtualServices(configfiles)
 	if err != nil {
 		return nil, err
 	}
-	parser := &Parsed{
+	parser := &Parser{
 		TestCases:       testCases,
 		VirtualServices: virtualServices,
 	}

@@ -3,8 +3,6 @@ package parser
 import (
 	"errors"
 	"io/ioutil"
-	"os"
-	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
@@ -89,39 +87,25 @@ func (r *Request) Unfold() ([]Input, error) {
 	return out, nil
 }
 
-func parseTestCases(rootDir string) ([]*TestCase, error) {
+func parseTestCases(files []string) ([]*TestCase, error) {
 	out := []*TestCase{}
-	err := filepath.Walk(rootDir,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
+	for _, file := range files {
+		yamlFile := &TestCaseYAML{}
+		fileContet, err := ioutil.ReadFile(file)
+		if err != nil {
+			return out, err
+		}
 
-			if info.IsDir() {
-				return nil
-			}
+		err = yaml.Unmarshal(fileContet, yamlFile)
+		if err != nil {
+			return out, err
+		}
 
-			yamlFile := &TestCaseYAML{}
-			fileContet, err := ioutil.ReadFile(path)
-			if err != nil {
-				return err
-			}
+		if len(yamlFile.TestCases) == 0 {
+			continue
+		}
 
-			err = yaml.Unmarshal(fileContet, yamlFile)
-			if err != nil {
-				return err
-			}
-
-			if len(yamlFile.TestCases) == 0 {
-				return nil
-			}
-
-			out = append(out, yamlFile.TestCases...)
-
-			return nil
-		})
-	if err != nil {
-		return nil, err
+		out = append(out, yamlFile.TestCases...)
 	}
 	return out, nil
 }
