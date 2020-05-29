@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"istio.io/pkg/log"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/unit"
 )
@@ -46,7 +47,7 @@ func main() {
 
 	err := unit.Run(testCaseFiles, istioConfigFiles)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err.Error())
 	}
 }
 
