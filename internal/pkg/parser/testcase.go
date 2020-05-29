@@ -1,12 +1,14 @@
 package parser
 
 import (
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"gopkg.in/yaml.v2"
+	"github.com/ghodss/yaml"
+	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
 )
 
 var (
@@ -25,9 +27,10 @@ type TestCaseYAML struct {
 
 // TestCase defines the API for declaring unit tests
 type TestCase struct {
-	Description string       `yaml:"description"`
-	Request     *Request     `yaml:"request"`
-	Destination *Destination `yaml:"destination"`
+	Description string                                     `yaml:"description"`
+	Request     *Request                                   `yaml:"request"`
+	Route       []*networkingv1alpha3.HTTPRouteDestination `yaml:"route"`
+	WantMatch   bool                                       `yam:"wantMatch`
 }
 
 // Request define the crafted http request present in the test case file.
@@ -101,13 +104,19 @@ func parseTestCases(rootDir string) ([]*TestCase, error) {
 				return nil
 			}
 
-			yamlFile := &TestCaseYAML{}
 			fileContet, err := ioutil.ReadFile(path)
 			if err != nil {
 				return err
 			}
 
-			err = yaml.Unmarshal(fileContet, yamlFile)
+			// we need to transform yaml to json so the marsheler from istio works
+			jsonBytes, err := yaml.YAMLToJSON(fileContet)
+			if err != nil {
+				return err
+			}
+
+			yamlFile := &TestCaseYAML{}
+			err = json.Unmarshal(jsonBytes, yamlFile)
 			if err != nil {
 				return err
 			}

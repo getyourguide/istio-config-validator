@@ -2,6 +2,7 @@ package unit
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
@@ -32,7 +33,11 @@ func Run(configuration *Configuration) error {
 		}
 		for _, input := range inputs {
 			destinations := GetDestination(input, parsed.VirtualServices)
-			fmt.Print(destinations)
+			if reflect.DeepEqual(destinations, testCase.Route) != testCase.WantMatch {
+				return fmt.Errorf("Destination missmatch=%v, want %v", destinations, testCase.Route)
+			}
+
+			log.Infof("input:[%v] PASS", input)
 		}
 	}
 	return nil

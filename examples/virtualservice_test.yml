@@ -1,20 +1,23 @@
 testCases:
   - description: happy path users
+    wantMatch: true
     request:
       authority: ["www.example.com", "example.com"]
       method: ["GET", "POST"]
       uri: ["/users", "/users/"]
       headers:
         x-user-id: abc123
-    destination:
-      host: users.users.svc.cluster.local
-      port:
-        number: 80
+    route:
+    - destination:
+        host: users.users.svc.cluster.local
+        port:
+          number: 80
   - description: Partner service only accepts GET or OPTIONS
+    wantMatch: false
     request:
       authority: ["example.com"]
       method: ["PUT", "POST", "PATCH"]
       uri: ["/partners", "/partners/1"]
-    destination:
-      host: partner.partner.svc.cluster.local
-    isMatch: false
+    route:
+    - destination:
+        host: partner.partner.svc.cluster.local
