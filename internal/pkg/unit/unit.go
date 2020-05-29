@@ -66,7 +66,7 @@ func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualServi
 }
 
 // AssertDestination will return true if the expected destination is present on the destination from matching rule
-func AssertDestination(out []*networkingv1alpha3.HTTPRouteDestination, expected *parser.Destination) bool {
+func AssertDestination(_ []*networkingv1alpha3.HTTPRouteDestination, _ *parser.Destination) bool {
 	return false
 }
 
