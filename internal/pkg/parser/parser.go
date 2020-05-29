@@ -11,7 +11,7 @@ type Parser struct {
 }
 
 // New parses and loads the testcases and istio configuration files
-func New(testfiles []string, configfiles []string) (*Parser, error) {
+func New(testfiles, configfiles []string) (*Parser, error) {
 	testCases, err := parseTestCases(testfiles)
 	if err != nil {
 		return nil, err
