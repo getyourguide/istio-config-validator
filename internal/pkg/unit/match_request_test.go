@@ -4,25 +4,31 @@ import (
 	"testing"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
-	"istio.io/api/networking/v1alpha3"
+	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
 )
 
 func Test_matchRequest(t *testing.T) {
 	type args struct {
 		input            parser.Input
-		httpMatchRequest *v1alpha3.HTTPMatchRequest
+		httpMatchRequest *networkingv1alpha3.HTTPMatchRequest
 	}
 	tests := []struct {
 		name string
 		args args
 		want bool
 	}{{
+		name: "no match conditions should always match",
+		args: args{
+			input:            parser.Input{Authority: "www.example.com", URI: "/", Method: "GET"},
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{}},
+		want: true,
+	}, {
 		name: "single match exact (true)",
 		args: args{
 			input: parser.Input{Authority: "www.example.com", URI: "/exac", Method: "GET"},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Uri: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Exact{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "/exac",
 					}}}},
 		want: true,
@@ -30,9 +36,9 @@ func Test_matchRequest(t *testing.T) {
 		name: "single match exact (false)",
 		args: args{
 			input: parser.Input{Authority: "www.example.com", URI: "/exac", Method: "GET"},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Uri: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Exact{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "/exac/",
 					}}}},
 		want: false,
@@ -40,9 +46,9 @@ func Test_matchRequest(t *testing.T) {
 		name: "single match prefix (true)",
 		args: args{
 			input: parser.Input{Authority: "www.example.com", URI: "/prefix/anotherpath", Method: "GET"},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Uri: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Prefix{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Prefix{
 						Prefix: "/prefix",
 					}}}},
 		want: true,
@@ -50,9 +56,9 @@ func Test_matchRequest(t *testing.T) {
 		name: "single match prefix (false)",
 		args: args{
 			input: parser.Input{Authority: "www.example.com", URI: "/not-prefix/anotherpath", Method: "GET"},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Uri: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Prefix{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Prefix{
 						Prefix: "/prefix",
 					}}}},
 		want: false,
@@ -60,9 +66,9 @@ func Test_matchRequest(t *testing.T) {
 		name: "single match regex (true)",
 		args: args{
 			input: parser.Input{Authority: "www.example.com", URI: "/regex/test", Method: "POST"},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Uri: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Regex{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "/reg.+?(/)",
 					}}}},
 		want: true,
@@ -70,9 +76,9 @@ func Test_matchRequest(t *testing.T) {
 		name: "single match regex (false)",
 		args: args{
 			input: parser.Input{Authority: "www.example.com", URI: "/not-regex/test", Method: "PATCH"},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Uri: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Regex{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "/reg(/)",
 					}}}},
 		want: false,
@@ -80,17 +86,17 @@ func Test_matchRequest(t *testing.T) {
 		name: "multiple match exact, prefix and regex (true)",
 		args: args{
 			input: parser.Input{Authority: "www.example.com", URI: "/prefix/anotherpath", Method: "GET"},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Authority: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Regex{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Authority: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "(www.)example.com",
 					}},
-				Uri: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Prefix{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Prefix{
 						Prefix: "/prefix",
 					}},
-				Method: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Exact{
+				Method: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "GET",
 					}}}},
 		want: true,
@@ -98,17 +104,17 @@ func Test_matchRequest(t *testing.T) {
 		name: "multiple match exact, prefix and regex (false)",
 		args: args{
 			input: parser.Input{Authority: "www.example.co", URI: "/prefix/anotherpath", Method: "GET"},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Authority: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Regex{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Authority: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "(www.)example.com",
 					}},
-				Uri: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Prefix{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Prefix{
 						Prefix: "/prefix",
 					}},
-				Method: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Exact{
+				Method: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "GET",
 					}}}},
 		want: false,
@@ -120,22 +126,22 @@ func Test_matchRequest(t *testing.T) {
 				"x-header-prefix": "prefix-something",
 				"x-header-regex":  "capture-this-regex",
 			}},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Authority: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Regex{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Authority: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "(www.)example.com",
 					}},
-				Headers: map[string]*v1alpha3.StringMatch{
+				Headers: map[string]*networkingv1alpha3.StringMatch{
 					"x-header-prefix": {
-						MatchType: &v1alpha3.StringMatch_Prefix{
+						MatchType: &networkingv1alpha3.StringMatch_Prefix{
 							Prefix: "prefix-",
 						}},
 					"x-header-exact": {
-						MatchType: &v1alpha3.StringMatch_Exact{
+						MatchType: &networkingv1alpha3.StringMatch_Exact{
 							Exact: "exact",
 						}},
 					"x-header-regex": {
-						MatchType: &v1alpha3.StringMatch_Regex{
+						MatchType: &networkingv1alpha3.StringMatch_Regex{
 							Regex: ".+?-this-.+?",
 						}}},
 			}},
@@ -148,22 +154,22 @@ func Test_matchRequest(t *testing.T) {
 				"x-header-prefix": "prefix-something",
 				"x-header-regex":  "capture-this-regex",
 			}},
-			httpMatchRequest: &v1alpha3.HTTPMatchRequest{
-				Authority: &v1alpha3.StringMatch{
-					MatchType: &v1alpha3.StringMatch_Regex{
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Authority: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "(www.)example.com",
 					}},
-				Headers: map[string]*v1alpha3.StringMatch{
+				Headers: map[string]*networkingv1alpha3.StringMatch{
 					"x-header-prefix": {
-						MatchType: &v1alpha3.StringMatch_Prefix{
+						MatchType: &networkingv1alpha3.StringMatch_Prefix{
 							Prefix: "not-prefix-",
 						}},
 					"x-header-exact": {
-						MatchType: &v1alpha3.StringMatch_Exact{
+						MatchType: &networkingv1alpha3.StringMatch_Exact{
 							Exact: "exact",
 						}},
 					"x-header-regex": {
-						MatchType: &v1alpha3.StringMatch_Regex{
+						MatchType: &networkingv1alpha3.StringMatch_Regex{
 							Regex: ".+?-this-.+?",
 						}}},
 			}},

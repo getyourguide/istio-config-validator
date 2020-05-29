@@ -1,8 +1,11 @@
 package unit
 
 import (
+	"fmt"
+
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
-	"istio.io/api/networking/v1alpha3"
+	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
+	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
 	"istio.io/pkg/log"
 )
 
@@ -23,14 +26,49 @@ func Run(configuration *Configuration) error {
 
 	for _, testCase := range parsed.TestCases {
 		log.Infof("running test: %s", testCase.Description)
-		// Unfold input
-		// for _, _ := range []parser.Input{{Authority: "www.example.com"}} {
-		// }
+		inputs, err := testCase.Request.Unfold()
+		if err != nil {
+			return err
+		}
+		for _, input := range inputs {
+			destinations := GetDestination(input, parsed.VirtualServices)
+			fmt.Print(destinations)
+		}
 	}
 	return nil
 }
 
-func inputMatch(input parser.Input, virtualServices []*v1alpha3.VirtualService) bool {
+// GetDestination return the destination list for a given input, it evaluates matching rules in VirtualServices
+// related to the input based on it's hosts list.
+func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualService) []*networkingv1alpha3.HTTPRouteDestination {
+	for _, vs := range virtualServices {
+		spec := vs.Spec
+		if !contains(spec.Hosts, input.Authority) {
+			continue
+		}
 
-	return true
+		for _, httpRoute := range spec.Http {
+			for _, matchBlock := range httpRoute.Match {
+				if matchRequest(input, matchBlock) {
+					return httpRoute.Route
+				}
+			}
+		}
+	}
+
+	return []*networkingv1alpha3.HTTPRouteDestination{}
+}
+
+// AssertDestination will return true if the expected destination is present on the destination from matching rule
+func AssertDestination(out []*networkingv1alpha3.HTTPRouteDestination, expected *parser.Destination) bool {
+	return false
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
