@@ -28,7 +28,7 @@ type TestCase struct {
 	Description string                                     `yaml:"description"`
 	Request     *Request                                   `yaml:"request"`
 	Route       []*networkingv1alpha3.HTTPRouteDestination `yaml:"route"`
-	WantMatch   bool                                       `yam:"wantMatch`
+	WantMatch   bool                                       `yam:"wantMatch"`
 }
 
 // Request define the crafted http request present in the test case file.
