@@ -58,11 +58,10 @@ func TestGetDestination(t *testing.T) {
 					Spec: networkingv1alpha3.VirtualService{
 						Hosts: []string{"www.notmatch.com"},
 						Http: []*networkingv1alpha3.HTTPRoute{{
-							Route: []*networkingv1alpha3.HTTPRouteDestination{
-								&networkingv1alpha3.HTTPRouteDestination{
-									Destination: &networkingv1alpha3.Destination{
-										Host: "notmatch.notmatch.svc.cluster.local",
-									}}},
+							Route: []*networkingv1alpha3.HTTPRouteDestination{{
+								Destination: &networkingv1alpha3.Destination{
+									Host: "notmatch.notmatch.svc.cluster.local",
+								}}},
 							Match: []*networkingv1alpha3.HTTPMatchRequest{{
 								Uri: &networkingv1alpha3.StringMatch{
 									MatchType: &networkingv1alpha3.StringMatch_Exact{
@@ -75,11 +74,10 @@ func TestGetDestination(t *testing.T) {
 					Spec: networkingv1alpha3.VirtualService{
 						Hosts: []string{"www.match.com"},
 						Http: []*networkingv1alpha3.HTTPRoute{{
-							Route: []*networkingv1alpha3.HTTPRouteDestination{
-								&networkingv1alpha3.HTTPRouteDestination{
-									Destination: &networkingv1alpha3.Destination{
-										Host: "match.match.svc.cluster.local",
-									}}},
+							Route: []*networkingv1alpha3.HTTPRouteDestination{{
+								Destination: &networkingv1alpha3.Destination{
+									Host: "match.match.svc.cluster.local",
+								}}},
 							Match: []*networkingv1alpha3.HTTPMatchRequest{{
 								Uri: &networkingv1alpha3.StringMatch{
 									MatchType: &networkingv1alpha3.StringMatch_Exact{
@@ -90,11 +88,10 @@ func TestGetDestination(t *testing.T) {
 						}},
 					}}},
 			},
-			want: []*networkingv1alpha3.HTTPRouteDestination{
-				&networkingv1alpha3.HTTPRouteDestination{
-					Destination: &networkingv1alpha3.Destination{
-						Host: "match.match.svc.cluster.local",
-					}}},
+			want: []*networkingv1alpha3.HTTPRouteDestination{{
+				Destination: &networkingv1alpha3.Destination{
+					Host: "match.match.svc.cluster.local",
+				}}},
 			wantErr: false,
 		}}
 
