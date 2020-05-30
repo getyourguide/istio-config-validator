@@ -4,24 +4,27 @@ import (
 	"testing"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
+	"istio.io/api/networking/v1alpha3"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
 )
 
 func Test_matchRequest(t *testing.T) {
 	type args struct {
 		input            parser.Input
-		httpMatchRequest *networkingv1alpha3.HTTPMatchRequest
+		httpMatchRequest *v1alpha3.HTTPMatchRequest
 	}
 	tests := []struct {
-		name string
-		args args
-		want bool
+		name    string
+		args    args
+		want    bool
+		wantErr bool
 	}{{
 		name: "no match conditions should always match",
 		args: args{
 			input:            parser.Input{Authority: "www.example.com", URI: "/", Method: "GET"},
 			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{}},
-		want: true,
+		want:    true,
+		wantErr: false,
 	}, {
 		name: "single match exact (true)",
 		args: args{
@@ -31,7 +34,8 @@ func Test_matchRequest(t *testing.T) {
 					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "/exac",
 					}}}},
-		want: true,
+		want:    true,
+		wantErr: false,
 	}, {
 		name: "single match exact (false)",
 		args: args{
@@ -41,7 +45,8 @@ func Test_matchRequest(t *testing.T) {
 					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "/exac/",
 					}}}},
-		want: false,
+		want:    false,
+		wantErr: false,
 	}, {
 		name: "single match prefix (true)",
 		args: args{
@@ -51,7 +56,8 @@ func Test_matchRequest(t *testing.T) {
 					MatchType: &networkingv1alpha3.StringMatch_Prefix{
 						Prefix: "/prefix",
 					}}}},
-		want: true,
+		want:    true,
+		wantErr: false,
 	}, {
 		name: "single match prefix (false)",
 		args: args{
@@ -61,7 +67,8 @@ func Test_matchRequest(t *testing.T) {
 					MatchType: &networkingv1alpha3.StringMatch_Prefix{
 						Prefix: "/prefix",
 					}}}},
-		want: false,
+		want:    false,
+		wantErr: false,
 	}, {
 		name: "single match regex (true)",
 		args: args{
@@ -71,7 +78,8 @@ func Test_matchRequest(t *testing.T) {
 					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "/reg.+?(/)",
 					}}}},
-		want: true,
+		want:    true,
+		wantErr: false,
 	}, {
 		name: "single match regex (false)",
 		args: args{
@@ -81,7 +89,8 @@ func Test_matchRequest(t *testing.T) {
 					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "/reg(/)",
 					}}}},
-		want: false,
+		want:    false,
+		wantErr: false,
 	}, {
 		name: "multiple match exact, prefix and regex (true)",
 		args: args{
@@ -99,7 +108,8 @@ func Test_matchRequest(t *testing.T) {
 					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "GET",
 					}}}},
-		want: true,
+		want:    true,
+		wantErr: false,
 	}, {
 		name: "multiple match exact, prefix and regex (false)",
 		args: args{
@@ -117,7 +127,8 @@ func Test_matchRequest(t *testing.T) {
 					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "GET",
 					}}}},
-		want: false,
+		want:    false,
+		wantErr: false,
 	}, {
 		name: "multiple match in headers, regex, prefix, exact (true)",
 		args: args{
@@ -145,7 +156,8 @@ func Test_matchRequest(t *testing.T) {
 							Regex: ".+?-this-.+?",
 						}}},
 			}},
-		want: true,
+		want:    true,
+		wantErr: false,
 	}, {
 		name: "multiple match in headers, regex, prefix, exact (false)",
 		args: args{
@@ -173,12 +185,18 @@ func Test_matchRequest(t *testing.T) {
 							Regex: ".+?-this-.+?",
 						}}},
 			}},
-		want: false,
+		want:    false,
+		wantErr: false,
 	}}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := matchRequest(tt.args.input, tt.args.httpMatchRequest); got != tt.want {
+			got, err := matchRequest(tt.args.input, tt.args.httpMatchRequest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("matchRequest() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
 				t.Errorf("matchRequest() = %v, want %v", got, tt.want)
 			}
 		})

@@ -13,11 +13,6 @@ import (
 	"istio.io/pkg/log"
 )
 
-// Configuration needed for unit tests
-type Configuration struct {
-	RootDir string
-}
-
 // Run is the entrypoint to run all unit tests defined in test cases
 func Run(testfiles, configfiles []string) error {
 
@@ -33,7 +28,10 @@ func Run(testfiles, configfiles []string) error {
 			return err
 		}
 		for _, input := range inputs {
-			destinations := GetDestination(input, parsed.VirtualServices)
+			destinations, err := GetDestination(input, parsed.VirtualServices)
+			if err != nil {
+				return fmt.Errorf("error getting destinations: %v", err)
+			}
 			if reflect.DeepEqual(destinations, testCase.Route) != testCase.WantMatch {
 				return fmt.Errorf("destination missmatch=%v, want %v", destinations, testCase.Route)
 			}
@@ -47,7 +45,7 @@ func Run(testfiles, configfiles []string) error {
 
 // GetDestination return the destination list for a given input, it evaluates matching rules in VirtualServices
 // related to the input based on it's hosts list.
-func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualService) []*networkingv1alpha3.HTTPRouteDestination {
+func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualService) ([]*networkingv1alpha3.HTTPRouteDestination, error) {
 	for _, vs := range virtualServices {
 		spec := vs.Spec
 		if !contains(spec.Hosts, input.Authority) {
@@ -56,19 +54,16 @@ func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualServi
 
 		for _, httpRoute := range spec.Http {
 			for _, matchBlock := range httpRoute.Match {
-				if matchRequest(input, matchBlock) {
-					return httpRoute.Route
+				if match, err := matchRequest(input, matchBlock); err != nil {
+					return []*networkingv1alpha3.HTTPRouteDestination{}, err
+				} else if match {
+					return httpRoute.Route, nil
 				}
 			}
 		}
 	}
 
-	return []*networkingv1alpha3.HTTPRouteDestination{}
-}
-
-// AssertDestination will return true if the expected destination is present on the destination from matching rule
-func AssertDestination(out []*networkingv1alpha3.HTTPRouteDestination, expected *parser.Destination) bool {
-	return false
+	return []*networkingv1alpha3.HTTPRouteDestination{}, nil
 }
 
 func contains(s []string, e string) bool {
