@@ -52,7 +52,7 @@ func matchRequest(input parser.Input, httpMatchRequest *v1alpha3.HTTPMatchReques
 
 	for headerName, sm := range httpMatchRequest.Headers {
 		if _, ok := input.Headers[headerName]; !ok {
-			continue
+			return false, nil
 		}
 		header := &ExtendedStringMatch{sm}
 		match, err := header.Match(input.Headers[headerName])
