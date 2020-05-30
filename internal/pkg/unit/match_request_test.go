@@ -21,7 +21,8 @@ func Test_matchRequest(t *testing.T) {
 		name: "no match conditions should always match",
 		args: args{
 			input:            parser.Input{Authority: "www.example.com", URI: "/", Method: "GET"},
-			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{}},
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{},
+		},
 		want:    true,
 		wantErr: false,
 	}, {
@@ -32,7 +33,10 @@ func Test_matchRequest(t *testing.T) {
 				Uri: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "/exac",
-					}}}},
+					},
+				},
+			},
+		},
 		want:    true,
 		wantErr: false,
 	}, {
@@ -43,7 +47,10 @@ func Test_matchRequest(t *testing.T) {
 				Uri: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "/exac/",
-					}}}},
+					},
+				},
+			},
+		},
 		want:    false,
 		wantErr: false,
 	}, {
@@ -54,7 +61,10 @@ func Test_matchRequest(t *testing.T) {
 				Uri: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Prefix{
 						Prefix: "/prefix",
-					}}}},
+					},
+				},
+			},
+		},
 		want:    true,
 		wantErr: false,
 	}, {
@@ -65,7 +75,10 @@ func Test_matchRequest(t *testing.T) {
 				Uri: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Prefix{
 						Prefix: "/prefix",
-					}}}},
+					},
+				},
+			},
+		},
 		want:    false,
 		wantErr: false,
 	}, {
@@ -76,7 +89,10 @@ func Test_matchRequest(t *testing.T) {
 				Uri: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "/reg.+?(/)",
-					}}}},
+					},
+				},
+			},
+		},
 		want:    true,
 		wantErr: false,
 	}, {
@@ -87,7 +103,10 @@ func Test_matchRequest(t *testing.T) {
 				Uri: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "/reg(/)",
-					}}}},
+					},
+				},
+			},
+		},
 		want:    false,
 		wantErr: false,
 	}, {
@@ -108,7 +127,10 @@ func Test_matchRequest(t *testing.T) {
 				Method: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "GET",
-					}}}},
+					},
+				},
+			},
+		},
 		want:    true,
 		wantErr: false,
 	}, {
@@ -129,7 +151,10 @@ func Test_matchRequest(t *testing.T) {
 				Method: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Exact{
 						Exact: "GET",
-					}}}},
+					},
+				},
+			},
+		},
 		want:    false,
 		wantErr: false,
 	}, {
@@ -160,8 +185,11 @@ func Test_matchRequest(t *testing.T) {
 					"x-header-regex": {
 						MatchType: &networkingv1alpha3.StringMatch_Regex{
 							Regex: ".+?-this-.+?",
-						}}},
-			}},
+						},
+					},
+				},
+			},
+		},
 		want:    true,
 		wantErr: false,
 	}, {
@@ -192,8 +220,11 @@ func Test_matchRequest(t *testing.T) {
 					"x-header-regex": {
 						MatchType: &networkingv1alpha3.StringMatch_Regex{
 							Regex: ".+?-this-.+?",
-						}}},
-			}},
+						},
+					},
+				},
+			},
+		},
 		want:    false,
 		wantErr: false,
 	}}
