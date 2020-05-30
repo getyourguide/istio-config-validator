@@ -52,6 +52,9 @@ func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualServi
 		}
 
 		for _, httpRoute := range spec.Http {
+			if len(httpRoute.Match) == 0 {
+				return httpRoute.Route, nil
+			}
 			for _, matchBlock := range httpRoute.Match {
 				if match, err := matchRequest(input, matchBlock); err != nil {
 					return []*networkingv1alpha3.HTTPRouteDestination{}, err
