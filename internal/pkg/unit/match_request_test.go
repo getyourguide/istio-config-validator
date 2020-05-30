@@ -4,14 +4,13 @@ import (
 	"testing"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
-	"istio.io/api/networking/v1alpha3"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
 )
 
 func Test_matchRequest(t *testing.T) {
 	type args struct {
 		input            parser.Input
-		httpMatchRequest *v1alpha3.HTTPMatchRequest
+		httpMatchRequest *networkingv1alpha3.HTTPMatchRequest
 	}
 	tests := []struct {
 		name    string
