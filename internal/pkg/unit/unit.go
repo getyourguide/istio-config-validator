@@ -15,7 +15,6 @@ import (
 
 // Run is the entrypoint to run all unit tests defined in test cases
 func Run(testfiles, configfiles []string) error {
-
 	parsed, err := parser.New(testfiles, configfiles)
 	if err != nil {
 		return err
