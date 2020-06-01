@@ -2,6 +2,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/getyourguide.com/istio-config-validator)](https://goreportcard.com/report/github.com/getyourguide.com/istio-config-validator)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/6bee3a704e8648949523cdcfcefacc1f)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=getyourguide/istio-config-validator&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/6bee3a704e8648949523cdcfcefacc1f)](https://www.codacy.com?utm_source=github.com&utm_medium=referral&utm_content=getyourguide/istio-config-validator&utm_campaign=Badge_Coverage)
 
 > The `istio-config-validator` tool is a **Work In Progress** project. 
 
