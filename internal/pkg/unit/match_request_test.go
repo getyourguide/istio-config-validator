@@ -96,6 +96,80 @@ func Test_matchRequest(t *testing.T) {
 		want:    true,
 		wantErr: false,
 	}, {
+		name: "single match invalid Authority regex",
+		args: args{
+			input: parser.Input{Authority: "www.example.com", URI: "/regex/test", Method: "POST"},
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Authority: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
+						Regex: "example(",
+					},
+				},
+			},
+		},
+		want:    false,
+		wantErr: true,
+	}, {
+		name: "single match invalid Method regex",
+		args: args{
+			input: parser.Input{Authority: "www.example.com", URI: "/regex/test", Method: "POST"},
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Method: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
+						Regex: "P(OS|U]T",
+					},
+				},
+			},
+		},
+		want:    false,
+		wantErr: true,
+	}, {
+		name: "single match invalid URI regex",
+		args: args{
+			input: parser.Input{Authority: "www.example.com", URI: "/regex/test", Method: "POST"},
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
+						Regex: "/reg.+?(/",
+					},
+				},
+			},
+		},
+		want:    false,
+		wantErr: true,
+	}, {
+		name: "single match non-existing Header regex",
+		args: args{
+			input: parser.Input{Authority: "www.example.com", URI: "/regex/test", Method: "POST", Headers: map[string]string{"x-header-test": "foo"}},
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Headers: map[string]*networkingv1alpha3.StringMatch{
+					"x-header-not-found": {
+						MatchType: &networkingv1alpha3.StringMatch_Regex{
+							Regex: ".*",
+						},
+					},
+				},
+			},
+		},
+		want:    false,
+		wantErr: false,
+	}, {
+		name: "single match invalid Header regex",
+		args: args{
+			input: parser.Input{Authority: "www.example.com", URI: "/regex/test", Method: "POST", Headers: map[string]string{"x-header-test": "foo"}},
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Headers: map[string]*networkingv1alpha3.StringMatch{
+					"x-header-test": {
+						MatchType: &networkingv1alpha3.StringMatch_Regex{
+							Regex: "(",
+						},
+					},
+				},
+			},
+		},
+		want:    false,
+		wantErr: true,
+	}, {
 		name: "single match regex (false)",
 		args: args{
 			input: parser.Input{Authority: "www.example.com", URI: "/not-regex/test", Method: "PATCH"},
