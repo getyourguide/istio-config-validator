@@ -1,10 +1,12 @@
 package parser
 
 import (
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
+	"github.com/ghodss/yaml"
+	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
 )
 
 var (
@@ -23,9 +25,12 @@ type TestCaseYAML struct {
 
 // TestCase defines the API for declaring unit tests
 type TestCase struct {
-	Description string       `yaml:"description"`
-	Request     *Request     `yaml:"request"`
-	Destination *Destination `yaml:"destination"`
+	Description string                                     `yaml:"description"`
+	Request     *Request                                   `yaml:"request"`
+	Route       []*networkingv1alpha3.HTTPRouteDestination `yaml:"route"`
+	Redirect    *networkingv1alpha3.HTTPRedirect           `yaml:"redirect"`
+	Rewrite     *networkingv1alpha3.HTTPRewrite            `yaml:"rewrite"`
+	WantMatch   bool                                       `yam:"wantMatch"`
 }
 
 // Request define the crafted http request present in the test case file.
@@ -89,16 +94,23 @@ func (r *Request) Unfold() ([]Input, error) {
 
 func parseTestCases(files []string) ([]*TestCase, error) {
 	out := []*TestCase{}
+
 	for _, file := range files {
-		yamlFile := &TestCaseYAML{}
 		fileContet, err := ioutil.ReadFile(file)
 		if err != nil {
-			return out, err
+			return []*TestCase{}, err
 		}
 
-		err = yaml.Unmarshal(fileContet, yamlFile)
+		// we need to transform yaml to json so the marsheler from istio works
+		jsonBytes, err := yaml.YAMLToJSON(fileContet)
 		if err != nil {
-			return out, err
+			return []*TestCase{}, err
+		}
+
+		yamlFile := &TestCaseYAML{}
+		err = json.Unmarshal(jsonBytes, yamlFile)
+		if err != nil {
+			return []*TestCase{}, err
 		}
 
 		if len(yamlFile.TestCases) == 0 {

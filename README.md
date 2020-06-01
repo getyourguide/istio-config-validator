@@ -1,6 +1,68 @@
-# istio-config-validator - test your istio config
+# istio-config-validator
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/getyourguide.com/istio-config-validator)](https://goreportcard.com/report/github.com/getyourguide.com/istio-config-validator)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/6bee3a704e8648949523cdcfcefacc1f)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=getyourguide/istio-config-validator&amp;utm_campaign=Badge_Grade)
+
+> The `istio-config-validator` tool is a **Work In Progress** project. 
+
+It provides to developers and cluster operators a way to test their changes in VirtualServices. We do it by mocking Istio/Envoy behavior to decide to which destination the request would go to. Eg:
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: example
+  namespace: example
+spec:
+  hosts:
+    - www.example.com
+    - example.com
+  http:
+    - match:
+        - uri:
+            regex: /users(/.*)?
+          headers:
+            x-user-type:
+              exact: qa
+      route:
+        - destination:
+            host: users.users.svc.cluster.local
+            port:
+              number: 80
+    - route:
+        - destination:
+            host: monolith.monolith.svc.cluster.local
+```
+
+Given the above `VirtualService`, developers can introduce test cases that covers the intended behavior as the following:
+
+```yaml
+testCases:
+  - description: Only QA users should go to the new Users microservice.
+    wantMatch: true
+    request:
+      authority: ["www.example.com", "example.com"]
+      method: ["GET", "OPTIONS", "POST"]
+      uri: ["/users", "/users/"]
+      headers:
+        x-user-type: qa
+    route:
+    - destination:
+        host: users.users.svc.cluster.local
+        port:
+          number: 80
+  - description: Fallback other user types to the monolith
+    wantMatch: true
+    request:
+      authority: ["www.example.com", "example.com"]
+      method: ["GET", "OPTIONS", "POST"]
+      uri: ["/users", "/users/"]
+    route:
+    - destination:
+        host: monolith.monolith.svc.cluster.local
+```
+
+Have a look in the [TestCase Reference](docs/test-cases.md) to learn more how to define the tests.
 
 ## Installation
 Either install the go package
@@ -49,3 +111,13 @@ Usage: istio-config-validator -t <testcases1.yml|testcasesdir1> [-t <testcases2.
 Compilation and building is handled in the Docker container:
 -   checkout the git repo
 -   in the repo folder, run `docker build -t istio-config-validator:latest .`
+
+
+## Known Limitations
+
+The API for test cases does not cover all aspects of VirtualServices.
+
+* Supported [HTTPMatchRequests](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPMatchRequest) fields to match requests against are: `authority`, `method`, `headers` and `uri`.
+  * Not supported ones: `scheme`, `port`, `queryParams`, etc. 
+* Supported assert against [HTTPRouteDestination](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRouteDestination)
+  * Not supported ones: [HTTPRedirect](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRedirect), [HTTPRewrite](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRewrite), etc.

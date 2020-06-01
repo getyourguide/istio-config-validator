@@ -1,34 +1,46 @@
 package parser
 
 import (
+	"encoding/json"
 	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
+	"github.com/ghodss/yaml"
+	"go.uber.org/zap/zapcore"
+
 	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
+	"istio.io/pkg/log"
 )
 
-// FIXME: Unmarshal doesn't parse the whole structure. istio/client-go seems to only parse `spec`.
 func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 	out := []*v1alpha3.VirtualService{}
+
 	for _, file := range files {
-		virtualService := &v1alpha3.VirtualService{}
 		fileContet, err := ioutil.ReadFile(file)
 		if err != nil {
-			return out, err
+			return []*v1alpha3.VirtualService{}, err
 		}
 
-		err = yaml.Unmarshal(fileContet, virtualService)
+		// we need to transform yaml to json so the marsheler from istio works
+		jsonBytes, err := yaml.YAMLToJSON(fileContet)
 		if err != nil {
-			return out, err
+			log.Debug("error converting yaml to json", zapcore.Field{Key: "file", String: file})
+			continue
 		}
 
-		// As we don't have the whole struct filled this is the way found to check if a
-		// file is a virtualservice.
-		if len(virtualService.Spec.Hosts) == 0 {
+		virtualService := &v1alpha3.VirtualService{}
+		err = json.Unmarshal(jsonBytes, virtualService)
+		if err != nil {
+			log.Debug("error while trying to unmarshal virtualservice", zapcore.Field{Key: "file", String: file})
+			continue
+		}
+
+		if virtualService.Kind != "VirtualService" {
+			log.Debug("file is not Kind VirtualService", zapcore.Field{Key: "file", String: file})
 			continue
 		}
 
 		out = append(out, virtualService)
 	}
+
 	return out, nil
 }

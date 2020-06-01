@@ -19,7 +19,7 @@ func TestParseVirtualServices(t *testing.T) {
 		t.Errorf("error getting test cases %v", err)
 	}
 	if len(parser.VirtualServices) == 0 {
-		t.Error("virtualservices are empty")
+		t.Error("virtualservices is empty")
 	}
 
 	for _, expected := range expectedTestCases {

@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
+	"istio.io/pkg/log"
+
+	"github.com/getyourguide/istio-config-validator/internal/pkg/unit"
 )
 
 type multiValueFlag []string
@@ -44,11 +45,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	p, err := parser.New(testCaseFiles, istioConfigFiles)
+	err := unit.Run(testCaseFiles, istioConfigFiles)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err.Error())
 	}
-	fmt.Printf("parser: %#v\n", p)
 }
 
 func getFiles(names []string) []string {
