@@ -21,8 +21,8 @@ spec:
         - uri:
             regex: /users(/.*)?
           headers:
-            x-user-id:
-              prefix: qa-
+            x-user-type:
+              exact: qa
       route:
         - destination:
             host: users.users.svc.cluster.local
@@ -37,25 +37,25 @@ Given the above `VirtualService`, developers can introduce test cases that cover
 
 ```yaml
 testCases:
-  - description: happy path users microservice
+  - description: Only QA users should go to the new Users microservice. (positive)
     wantMatch: true
     request:
       authority: ["www.example.com", "example.com"]
       method: ["GET", "OPTIONS", "POST"]
       uri: ["/users", "/users/"]
       headers:
-        x-user-id: qa-abc123
+        x-user-type: qa
     route:
     - destination:
         host: users.users.svc.cluster.local
         port:
           number: 80
-  - description: Fallback
+  - description: Fallback other paths to the monolith
     wantMatch: true
     request:
       authority: ["example.com"]
       method: ["GET", "OPTIONS"]
-      uri: ["/products", "/products/1"]
+      uri: ["/products", "/products/1", "/"]
     route:
     - destination:
         host: monolith.monolith.svc.cluster.local
