@@ -29,9 +29,11 @@ func Run(testfiles, configfiles []string) error {
 		for _, input := range inputs {
 			destinations, err := GetDestination(input, parsed.VirtualServices)
 			if err != nil {
+				log.Infof("FAIL input:[%v]", input)
 				return fmt.Errorf("error getting destinations: %v", err)
 			}
 			if reflect.DeepEqual(destinations, testCase.Route) != testCase.WantMatch {
+				log.Infof("FAIL input:[%v]", input)
 				return fmt.Errorf("destination missmatch=%v, want %v", destinations, testCase.Route)
 			}
 
