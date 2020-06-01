@@ -28,6 +28,8 @@ type TestCase struct {
 	Description string                                     `yaml:"description"`
 	Request     *Request                                   `yaml:"request"`
 	Route       []*networkingv1alpha3.HTTPRouteDestination `yaml:"route"`
+	Redirect    *networkingv1alpha3.HTTPRedirect           `yaml:"redirect"`
+	Rewrite     *networkingv1alpha3.HTTPRewrite            `yaml:"rewrite"`
 	WantMatch   bool                                       `yam:"wantMatch"`
 }
 
