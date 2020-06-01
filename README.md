@@ -51,7 +51,7 @@ testCases:
         port:
           number: 80
   - description: Fallback
-    wantMatch: false
+    wantMatch: true
     request:
       authority: ["example.com"]
       method: ["GET", "OPTIONS"]
