@@ -38,7 +38,7 @@ Given the above `VirtualService`, developers can introduce test cases that cover
 
 ```yaml
 testCases:
-  - description: Only QA users should go to the new Users microservice. (positive)
+  - description: Only QA users should go to the new Users microservice.
     wantMatch: true
     request:
       authority: ["www.example.com", "example.com"]
@@ -51,12 +51,12 @@ testCases:
         host: users.users.svc.cluster.local
         port:
           number: 80
-  - description: Fallback other paths to the monolith
+  - description: Fallback other user types to the monolith
     wantMatch: true
     request:
-      authority: ["example.com"]
-      method: ["GET", "OPTIONS"]
-      uri: ["/products", "/products/1", "/"]
+      authority: ["www.example.com", "example.com"]
+      method: ["GET", "OPTIONS", "POST"]
+      uri: ["/users", "/users/"]
     route:
     - destination:
         host: monolith.monolith.svc.cluster.local
