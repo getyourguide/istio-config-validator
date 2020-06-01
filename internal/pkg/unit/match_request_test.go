@@ -96,6 +96,20 @@ func Test_matchRequest(t *testing.T) {
 		want:    true,
 		wantErr: false,
 	}, {
+		name: "single match invalid regex",
+		args: args{
+			input: parser.Input{Authority: "www.example.com", URI: "/regex/test", Method: "POST"},
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
+						Regex: "/reg.+?(/",
+					},
+				},
+			},
+		},
+		want:    false,
+		wantErr: true,
+	}, {
 		name: "single match regex (false)",
 		args: args{
 			input: parser.Input{Authority: "www.example.com", URI: "/not-regex/test", Method: "PATCH"},
