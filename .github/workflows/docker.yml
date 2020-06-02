@@ -9,6 +9,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v1
     - name: Build and push docker image
       uses: docker/build-push-action@v1
       with:
