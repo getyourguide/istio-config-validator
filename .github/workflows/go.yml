@@ -55,6 +55,7 @@ jobs:
         go test -coverprofile=./coverage.out ./...
         godacov -r ./coverage.out -t ${{ secrets.CODACY_PROJECT_TOKEN }} -c ${{ github.sha }}
     - name: Build and push docker image
+      if: matrix.platform == 'ubuntu-latest'
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
