@@ -25,11 +25,12 @@ func (m *multiValueFlag) Set(value string) error {
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s -t <testcases1.yml|testcasesdir1> [-t <testcases2.yml|testcasesdir2> ...] <istioconfig1.yml|istioconfigdir1> [<istioconfig2.yml|istioconfigdir2> ...]\n\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [-s] -t <testcases1.yml|testcasesdir1> [-t <testcases2.yml|testcasesdir2> ...] <istioconfig1.yml|istioconfigdir1> [<istioconfig2.yml|istioconfigdir2> ...]\n\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 	var testCaseParams multiValueFlag
 	flag.Var(&testCaseParams, "t", "Testcase files/folders")
+	summaryOnly := flag.Bool("s", false, "show only summary of tests (in case of failures full details are shown)")
 	flag.Parse()
 	istioConfigFiles := getFiles(flag.Args())
 	testCaseFiles := getFiles(testCaseParams)
@@ -45,10 +46,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := unit.Run(testCaseFiles, istioConfigFiles)
+	summary, details, err := unit.Run(testCaseFiles, istioConfigFiles)
 	if err != nil {
+		fmt.Println(strings.Join(details, "\n"))
 		log.Fatal(err.Error())
 	}
+	if !*summaryOnly {
+		fmt.Println(strings.Join(details, "\n"))
+		fmt.Println("")
+	}
+	fmt.Println(strings.Join(summary, "\n"))
 }
 
 func getFiles(names []string) []string {
