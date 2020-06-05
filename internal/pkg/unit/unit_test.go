@@ -13,7 +13,7 @@ func TestRun(t *testing.T) {
 	testcasefiles := []string{"../../../examples/virtualservice_test.yml"}
 	configfiles := []string{"../../../examples/virtualservice.yml"}
 
-	err := Run(testcasefiles, configfiles)
+	_, _, err := Run(testcasefiles, configfiles)
 	if err != nil {
 		t.Error(err)
 	}

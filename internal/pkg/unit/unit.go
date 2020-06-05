@@ -10,38 +10,43 @@ import (
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
 	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
-	"istio.io/pkg/log"
 )
 
 // Run is the entrypoint to run all unit tests defined in test cases
-func Run(testfiles, configfiles []string) error {
+func Run(testfiles, configfiles []string) ([]string, []string, error) {
+	var summary, details []string
 	parsed, err := parser.New(testfiles, configfiles)
 	if err != nil {
-		return err
+		return summary, details, err
 	}
 
+	inputCount := 0
 	for _, testCase := range parsed.TestCases {
-		log.Infof("running test: %s", testCase.Description)
+		details = append(details, "running test: "+testCase.Description)
 		inputs, err := testCase.Request.Unfold()
 		if err != nil {
-			return err
+			return summary, details, err
 		}
 		for _, input := range inputs {
 			destinations, err := GetDestination(input, parsed.VirtualServices)
 			if err != nil {
-				log.Infof("FAIL input:[%v]", input)
-				return fmt.Errorf("error getting destinations: %v", err)
+				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+				return summary, details, fmt.Errorf("error getting destinations: %v", err)
 			}
 			if reflect.DeepEqual(destinations, testCase.Route) != testCase.WantMatch {
-				log.Infof("FAIL input:[%v]", input)
-				return fmt.Errorf("destination missmatch=%v, want %v", destinations, testCase.Route)
+				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+				return summary, details, fmt.Errorf("destination missmatch=%v, want %v", destinations, testCase.Route)
 			}
 
-			log.Infof("PASS input:[%v]", input)
+			details = append(details, fmt.Sprintf("PASS input:[%v]", input))
 		}
-		fmt.Print("===========================\n")
+		inputCount += len(inputs)
+		details = append(details, "===========================")
 	}
-	return nil
+	summary = append(summary, "Test summary:")
+	summary = append(summary, fmt.Sprintf(" - %d testfiles, %d configfiles", len(testfiles), len(configfiles)))
+	summary = append(summary, fmt.Sprintf(" - %d testcases with %d inputs passed", len(parsed.TestCases), inputCount))
+	return summary, details, nil
 }
 
 // GetDestination return the destination list for a given input, it evaluates matching rules in VirtualServices
