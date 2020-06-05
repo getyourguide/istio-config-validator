@@ -96,13 +96,13 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 	out := []*TestCase{}
 
 	for _, file := range files {
-		fileContet, err := ioutil.ReadFile(file)
+		fileContent, err := ioutil.ReadFile(file)
 		if err != nil {
 			return []*TestCase{}, err
 		}
 
-		// we need to transform yaml to json so the marsheler from istio works
-		jsonBytes, err := yaml.YAMLToJSON(fileContet)
+		// we need to transform yaml to json so the marshaler from istio works
+		jsonBytes, err := yaml.YAMLToJSON(fileContent)
 		if err != nil {
 			return []*TestCase{}, err
 		}

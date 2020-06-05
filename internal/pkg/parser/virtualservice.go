@@ -15,13 +15,13 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 	out := []*v1alpha3.VirtualService{}
 
 	for _, file := range files {
-		fileContet, err := ioutil.ReadFile(file)
+		fileContent, err := ioutil.ReadFile(file)
 		if err != nil {
 			return []*v1alpha3.VirtualService{}, err
 		}
 
-		// we need to transform yaml to json so the marsheler from istio works
-		jsonBytes, err := yaml.YAMLToJSON(fileContet)
+		// we need to transform yaml to json so the marshaler from istio works
+		jsonBytes, err := yaml.YAMLToJSON(fileContent)
 		if err != nil {
 			log.Debug("error converting yaml to json", zapcore.Field{Key: "file", String: file})
 			continue
