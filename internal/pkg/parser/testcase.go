@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/ghodss/yaml"
@@ -98,19 +99,19 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 	for _, file := range files {
 		fileContet, err := ioutil.ReadFile(file)
 		if err != nil {
-			return []*TestCase{}, err
+			return []*TestCase{}, fmt.Errorf("reading file '%s' failed: %w", file, err)
 		}
 
 		// we need to transform yaml to json so the marsheler from istio works
 		jsonBytes, err := yaml.YAMLToJSON(fileContet)
 		if err != nil {
-			return []*TestCase{}, err
+			return []*TestCase{}, fmt.Errorf("yamltojson conversion failed for file '%s': %w", file, err)
 		}
 
 		yamlFile := &TestCaseYAML{}
 		err = json.Unmarshal(jsonBytes, yamlFile)
 		if err != nil {
-			return []*TestCase{}, err
+			return []*TestCase{}, fmt.Errorf("unmarshaling failed for file '%s': %w", file, err)
 		}
 
 		if len(yamlFile.TestCases) == 0 {

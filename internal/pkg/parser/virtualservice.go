@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/ghodss/yaml"
@@ -17,7 +18,7 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 	for _, file := range files {
 		fileContet, err := ioutil.ReadFile(file)
 		if err != nil {
-			return []*v1alpha3.VirtualService{}, err
+			return []*v1alpha3.VirtualService{}, fmt.Errorf("reading file '%s' failed: %w", file, err)
 		}
 
 		// we need to transform yaml to json so the marsheler from istio works
