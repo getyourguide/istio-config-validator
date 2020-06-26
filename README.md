@@ -107,6 +107,10 @@ Usage: istio-config-validator -t <testcases1.yml|testcasesdir1> [-t <testcases2.
 ===========================
 ```
 
+## Contributing
+
+If you're interested in contributing to this project or running a dev version, have a look into the [CONTRIBUTING](CONTRIBUTING.md) document
+
 ## Known Limitations
 
 The API for test cases does not cover all aspects of VirtualServices.
