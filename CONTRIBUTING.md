@@ -1,7 +1,6 @@
 # Contributing
 
-When contributing to this repository, please first discuss the change you wish to make via issue,
-email, or any other method with the owners of this repository before submiting a change. 
+When contributing to this repository, we encourage to first discuss the change you wish to make via issue before submiting a change. We're not strict about this and for small changes feel free to PR direcltely.
 
 ## Development Environment
 
