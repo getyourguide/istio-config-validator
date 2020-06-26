@@ -107,14 +107,6 @@ Usage: istio-config-validator -t <testcases1.yml|testcasesdir1> [-t <testcases2.
 ===========================
 ```
 
-## Development and contributing
-
-Compilation and building is handled in the Docker container:
--   checkout the git repo
--   in the repo folder, run `docker build -t istio-config-validator:latest .`
-
-We welcome pull requests; if you are planning to perform bigger changes then it makes sense to file an issue first.
-
 ## Known Limitations
 
 The API for test cases does not cover all aspects of VirtualServices.
