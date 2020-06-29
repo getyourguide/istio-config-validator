@@ -1,6 +1,5 @@
 # Changelog
 
-
 ## v0.1.0
 
 The API for test cases does not cover all aspects of VirtualServices.
