@@ -7,6 +7,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	"go.uber.org/zap/zapcore"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
 	"istio.io/pkg/log"
@@ -24,20 +25,27 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 		// we need to transform yaml to json so the marshaler from istio works
 		jsonBytes, err := yaml.YAMLToJSON(fileContent)
 		if err != nil {
-			log.Debug("error converting yaml to json", zapcore.Field{Key: "file", String: file})
+			log.Debug("error converting yaml to json", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+			continue
+		}
+
+		meta := &v1.TypeMeta{}
+		err = json.Unmarshal(jsonBytes, meta)
+		if err != nil {
+			log.Debug("error extracting the metadata of the virtualservice", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+			continue
+		}
+
+		if meta.Kind != "VirtualService" {
+			log.Debug("file is not Kind VirtualService", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
 			continue
 		}
 
 		virtualService := &v1alpha3.VirtualService{}
 		err = json.Unmarshal(jsonBytes, virtualService)
 		if err != nil {
-			log.Debug("error while trying to unmarshal virtualservice", zapcore.Field{Key: "file", String: file})
-			continue
-		}
-
-		if virtualService.Kind != "VirtualService" {
-			log.Debug("file is not Kind VirtualService", zapcore.Field{Key: "file", String: file})
-			continue
+			log.Debug("error while trying to unmarshal virtualservice", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+			return out, err
 		}
 
 		out = append(out, virtualService)
