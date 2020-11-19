@@ -146,3 +146,69 @@ func TestGetDestination(t *testing.T) {
 		})
 	}
 }
+
+func TestGetRoute(t *testing.T) {
+	type args struct {
+		input           parser.Input
+		virtualServices []*v1alpha3.VirtualService
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *networkingv1alpha3.HTTPRoute
+		wantErr bool
+	}{
+		{
+			name: "match and assert rewrite and destination",
+			args: args{
+				input: parser.Input{Authority: "www.match.com", URI: "/"},
+				virtualServices: []*v1alpha3.VirtualService{{
+					Spec: networkingv1alpha3.VirtualService{
+						Hosts: []string{"www.match.com"},
+						Http: []*networkingv1alpha3.HTTPRoute{{
+							Route: []*networkingv1alpha3.HTTPRouteDestination{{
+								Destination: &networkingv1alpha3.Destination{
+									Host: "match.match.svc.cluster.local",
+								},
+							}},
+							Match: []*networkingv1alpha3.HTTPMatchRequest{{
+								Uri: &networkingv1alpha3.StringMatch{
+									MatchType: &networkingv1alpha3.StringMatch_Exact{
+										Exact: "/",
+									},
+								},
+							}},
+						}},
+					},
+				}},
+			},
+			want: &networkingv1alpha3.HTTPRoute{
+				Route: []*networkingv1alpha3.HTTPRouteDestination{{
+					Destination: &networkingv1alpha3.Destination{
+						Host: "match.match.svc.cluster.local",
+					},
+				}},
+				Match: []*networkingv1alpha3.HTTPMatchRequest{{
+					Uri: &networkingv1alpha3.StringMatch{
+						MatchType: &networkingv1alpha3.StringMatch_Exact{
+							Exact: "/",
+						},
+					},
+				}},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetRoute(tt.args.input, tt.args.virtualServices)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetRoute() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetRoute() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

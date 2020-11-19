@@ -75,6 +75,31 @@ func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualServi
 	return []*networkingv1alpha3.HTTPRouteDestination{}, nil
 }
 
+// GetRoute returns the route that matched a given input.
+func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService) (*networkingv1alpha3.HTTPRoute, error) {
+	for _, vs := range virtualServices {
+		spec := vs.Spec
+		if !contains(spec.Hosts, input.Authority) {
+			continue
+		}
+
+		for _, httpRoute := range spec.Http {
+			if len(httpRoute.Match) == 0 {
+				return httpRoute, nil
+			}
+			for _, matchBlock := range httpRoute.Match {
+				if match, err := matchRequest(input, matchBlock); err != nil {
+					return &networkingv1alpha3.HTTPRoute{}, err
+				} else if match {
+					return httpRoute, nil
+				}
+			}
+		}
+	}
+
+	return &networkingv1alpha3.HTTPRoute{}, nil
+}
+
 func contains(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
