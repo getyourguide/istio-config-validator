@@ -4,7 +4,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/6bee3a704e8648949523cdcfcefacc1f)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=getyourguide/istio-config-validator&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/6bee3a704e8648949523cdcfcefacc1f)](https://www.codacy.com?utm_source=github.com&utm_medium=referral&utm_content=getyourguide/istio-config-validator&utm_campaign=Badge_Coverage)
 
-> The `istio-config-validator` tool is a **Work In Progress** project. 
+> The `istio-config-validator` tool is a **Work In Progress** project.
 
 It provides to developers and cluster operators a way to test their changes in VirtualServices. We do it by mocking Istio/Envoy behavior to decide to which destination the request would go to. Eg:
 
@@ -118,8 +118,8 @@ The API for test cases does not cover all aspects of VirtualServices.
 -   Supported [HTTPMatchRequests](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPMatchRequest) fields to match requests against are: `authority`, `method`, `headers` and `uri`.
     -   Not supported ones: `scheme`, `port`, `queryParams`, etc.
 
--   Supported assert against [HTTPRouteDestination](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRouteDestination)
-    -   Not supported ones: [HTTPRedirect](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRedirect), [HTTPRewrite](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRewrite), etc.
+-   Supported assert against [HTTPRouteDestination](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRouteDestination) and [HTTPRewrite](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRewrite)
+    -   Not supported ones: [HTTPRedirect](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRedirect), etc.
 
 ## Security
 
