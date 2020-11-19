@@ -29,28 +29,29 @@ func TestGetRoute(t *testing.T) {
 		args    args
 		want    *networkingv1alpha3.HTTPRoute
 		wantErr bool
-	}{{
-		name: "no host match, empty destination",
-		args: args{
-			input: parser.Input{Authority: "www.exemple.com", URI: "/"},
-			virtualServices: []*v1alpha3.VirtualService{{
-				Spec: networkingv1alpha3.VirtualService{
-					Hosts: []string{"www.another-example.com"},
-					Http: []*networkingv1alpha3.HTTPRoute{{
-						Match: []*networkingv1alpha3.HTTPMatchRequest{{
-							Uri: &networkingv1alpha3.StringMatch{
-								MatchType: &networkingv1alpha3.StringMatch_Exact{
-									Exact: "/",
+	}{
+		{
+			name: "no host match, empty destination",
+			args: args{
+				input: parser.Input{Authority: "www.exemple.com", URI: "/"},
+				virtualServices: []*v1alpha3.VirtualService{{
+					Spec: networkingv1alpha3.VirtualService{
+						Hosts: []string{"www.another-example.com"},
+						Http: []*networkingv1alpha3.HTTPRoute{{
+							Match: []*networkingv1alpha3.HTTPMatchRequest{{
+								Uri: &networkingv1alpha3.StringMatch{
+									MatchType: &networkingv1alpha3.StringMatch_Exact{
+										Exact: "/",
+									},
 								},
-							},
+							}},
 						}},
-					}},
-				},
-			}},
+					},
+				}},
+			},
+			want:    &networkingv1alpha3.HTTPRoute{},
+			wantErr: false,
 		},
-		want:    &networkingv1alpha3.HTTPRoute{},
-		wantErr: false,
-	},
 		{
 			name: "match a fallback destination",
 			args: args{
@@ -81,9 +82,11 @@ func TestGetRoute(t *testing.T) {
 					Destination: &networkingv1alpha3.Destination{
 						Host: "fallback.fallback.svc.cluster.local",
 					},
-				}}},
+				}},
+			},
 			wantErr: false,
-		}, {
+		},
+		{
 			name: "match single destination, multiple virtualservices",
 			args: args{
 				input: parser.Input{Authority: "www.match.com", URI: "/"},
@@ -136,9 +139,11 @@ func TestGetRoute(t *testing.T) {
 							Exact: "/",
 						},
 					},
-				}}},
+				}},
+			},
 			wantErr: false,
-		}, {
+		},
+		{
 			name: "match and assert rewrite and destination",
 			args: args{
 				input: parser.Input{Authority: "www.match.com", URI: "/"},
