@@ -19,7 +19,7 @@ func TestRun(t *testing.T) {
 	}
 }
 
-func TestGetDestination(t *testing.T) {
+func TestGetRoute(t *testing.T) {
 	type args struct {
 		input           parser.Input
 		virtualServices []*v1alpha3.VirtualService
@@ -27,16 +27,37 @@ func TestGetDestination(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []*networkingv1alpha3.HTTPRouteDestination
+		want    *networkingv1alpha3.HTTPRoute
 		wantErr bool
-	}{
+	}{{
+		name: "no host match, empty destination",
+		args: args{
+			input: parser.Input{Authority: "www.exemple.com", URI: "/"},
+			virtualServices: []*v1alpha3.VirtualService{{
+				Spec: networkingv1alpha3.VirtualService{
+					Hosts: []string{"www.another-example.com"},
+					Http: []*networkingv1alpha3.HTTPRoute{{
+						Match: []*networkingv1alpha3.HTTPMatchRequest{{
+							Uri: &networkingv1alpha3.StringMatch{
+								MatchType: &networkingv1alpha3.StringMatch_Exact{
+									Exact: "/",
+								},
+							},
+						}},
+					}},
+				},
+			}},
+		},
+		want:    &networkingv1alpha3.HTTPRoute{},
+		wantErr: false,
+	},
 		{
-			name: "no host match, empty destination",
+			name: "match a fallback destination",
 			args: args{
-				input: parser.Input{Authority: "www.exemple.com", URI: "/"},
+				input: parser.Input{Authority: "www.example.com", URI: "/path-to-fallback"},
 				virtualServices: []*v1alpha3.VirtualService{{
 					Spec: networkingv1alpha3.VirtualService{
-						Hosts: []string{"www.another-example.com"},
+						Hosts: []string{"www.example.com"},
 						Http: []*networkingv1alpha3.HTTPRoute{{
 							Match: []*networkingv1alpha3.HTTPMatchRequest{{
 								Uri: &networkingv1alpha3.StringMatch{
@@ -45,11 +66,22 @@ func TestGetDestination(t *testing.T) {
 									},
 								},
 							}},
+						}, {
+							Route: []*networkingv1alpha3.HTTPRouteDestination{{
+								Destination: &networkingv1alpha3.Destination{
+									Host: "fallback.fallback.svc.cluster.local",
+								},
+							}},
 						}},
 					},
 				}},
 			},
-			want:    []*networkingv1alpha3.HTTPRouteDestination{},
+			want: &networkingv1alpha3.HTTPRoute{
+				Route: []*networkingv1alpha3.HTTPRouteDestination{{
+					Destination: &networkingv1alpha3.Destination{
+						Host: "fallback.fallback.svc.cluster.local",
+					},
+				}}},
 			wantErr: false,
 		}, {
 			name: "match single destination, multiple virtualservices",
@@ -93,72 +125,20 @@ func TestGetDestination(t *testing.T) {
 					},
 				}},
 			},
-			want: []*networkingv1alpha3.HTTPRouteDestination{{
-				Destination: &networkingv1alpha3.Destination{
-					Host: "match.match.svc.cluster.local",
-				},
-			}},
+			want: &networkingv1alpha3.HTTPRoute{
+				Route: []*networkingv1alpha3.HTTPRouteDestination{{
+					Destination: &networkingv1alpha3.Destination{
+						Host: "match.match.svc.cluster.local",
+					},
+				}}, Match: []*networkingv1alpha3.HTTPMatchRequest{{
+					Uri: &networkingv1alpha3.StringMatch{
+						MatchType: &networkingv1alpha3.StringMatch_Exact{
+							Exact: "/",
+						},
+					},
+				}}},
 			wantErr: false,
 		}, {
-			name: "match a fallback destination",
-			args: args{
-				input: parser.Input{Authority: "www.example.com", URI: "/path-to-fallback"},
-				virtualServices: []*v1alpha3.VirtualService{{
-					Spec: networkingv1alpha3.VirtualService{
-						Hosts: []string{"www.example.com"},
-						Http: []*networkingv1alpha3.HTTPRoute{{
-							Match: []*networkingv1alpha3.HTTPMatchRequest{{
-								Uri: &networkingv1alpha3.StringMatch{
-									MatchType: &networkingv1alpha3.StringMatch_Exact{
-										Exact: "/",
-									},
-								},
-							}},
-						}, {
-							Route: []*networkingv1alpha3.HTTPRouteDestination{{
-								Destination: &networkingv1alpha3.Destination{
-									Host: "fallback.fallback.svc.cluster.local",
-								},
-							}},
-						}},
-					},
-				}},
-			},
-			want: []*networkingv1alpha3.HTTPRouteDestination{{
-				Destination: &networkingv1alpha3.Destination{
-					Host: "fallback.fallback.svc.cluster.local",
-				},
-			}},
-			wantErr: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetDestination(tt.args.input, tt.args.virtualServices)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetDestination() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetDestination() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestGetRoute(t *testing.T) {
-	type args struct {
-		input           parser.Input
-		virtualServices []*v1alpha3.VirtualService
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *networkingv1alpha3.HTTPRoute
-		wantErr bool
-	}{
-		{
 			name: "match and assert rewrite and destination",
 			args: args{
 				input: parser.Input{Authority: "www.match.com", URI: "/"},

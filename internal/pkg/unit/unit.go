@@ -40,7 +40,7 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 			if testCase.Rewrite != nil {
 				if reflect.DeepEqual(route.Rewrite, testCase.Rewrite) != testCase.WantMatch {
 					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-					return summary, details, fmt.Errorf("destination missmatch=%v, want %v", route.Rewrite, testCase.Rewrite)
+					return summary, details, fmt.Errorf("rewrite missmatch=%v, want %v", route.Rewrite, testCase.Rewrite)
 				}
 			}
 
@@ -53,32 +53,6 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 	summary = append(summary, fmt.Sprintf(" - %d testfiles, %d configfiles", len(testfiles), len(configfiles)))
 	summary = append(summary, fmt.Sprintf(" - %d testcases with %d inputs passed", len(parsed.TestCases), inputCount))
 	return summary, details, nil
-}
-
-// GetDestination return the destination list for a given input, it evaluates matching rules in VirtualServices
-// related to the input based on it's hosts list.
-func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualService) ([]*networkingv1alpha3.HTTPRouteDestination, error) {
-	for _, vs := range virtualServices {
-		spec := vs.Spec
-		if !contains(spec.Hosts, input.Authority) {
-			continue
-		}
-
-		for _, httpRoute := range spec.Http {
-			if len(httpRoute.Match) == 0 {
-				return httpRoute.Route, nil
-			}
-			for _, matchBlock := range httpRoute.Match {
-				if match, err := matchRequest(input, matchBlock); err != nil {
-					return []*networkingv1alpha3.HTTPRouteDestination{}, err
-				} else if match {
-					return httpRoute.Route, nil
-				}
-			}
-		}
-	}
-
-	return []*networkingv1alpha3.HTTPRouteDestination{}, nil
 }
 
 // GetRoute returns the route that matched a given input.
