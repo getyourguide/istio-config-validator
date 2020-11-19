@@ -21,3 +21,14 @@ testCases:
     route:
     - destination:
         host: partner.partner.svc.cluster.local
+  - description: Reseller is rewritten as partner
+    wantMatch: true
+    request:
+      authority: ["example.com"]
+      method: ["PUT", "POST", "PATCH"]
+      uri: ["/reseller"]
+    route:
+    - destination:
+        host: partner.partner.svc.cluster.local
+    rewrite:
+      uri: "/partner"

@@ -28,6 +28,14 @@ spec:
             host: partner.partner.svc.cluster.local
             port:
               number: 8000
+    - match:
+        - uri:
+            prefix: /reseller
+      route:
+        - destination:
+            host: partner.partner.svc.cluster.local
+      rewrite:
+        uri: "/partn"
     - route:
         - destination:
             host: monolith.monolith.svc.cluster.local
