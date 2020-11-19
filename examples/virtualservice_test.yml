@@ -32,3 +32,14 @@ testCases:
         host: partner.partner.svc.cluster.local
     rewrite:
       uri: "/partner"
+  - description: Reseller doesn't match rewritten as catalog
+    wantMatch: false
+    request:
+      authority: ["example.com"]
+      method: ["PUT", "POST", "PATCH"]
+      uri: ["/reseller"]
+    route:
+    - destination:
+        host: catalog.catalog.svc.cluster.local
+    rewrite:
+      uri: "/catalog"

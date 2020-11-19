@@ -35,7 +35,7 @@ spec:
         - destination:
             host: partner.partner.svc.cluster.local
       rewrite:
-        uri: "/partn"
+        uri: "/partner"
     - route:
         - destination:
             host: monolith.monolith.svc.cluster.local

@@ -28,14 +28,20 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 			return summary, details, err
 		}
 		for _, input := range inputs {
-			destinations, err := GetDestination(input, parsed.VirtualServices)
+			route, err := GetRoute(input, parsed.VirtualServices)
 			if err != nil {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 				return summary, details, fmt.Errorf("error getting destinations: %v", err)
 			}
-			if reflect.DeepEqual(destinations, testCase.Route) != testCase.WantMatch {
+			if reflect.DeepEqual(route.Route, testCase.Route) != testCase.WantMatch {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-				return summary, details, fmt.Errorf("destination missmatch=%v, want %v", destinations, testCase.Route)
+				return summary, details, fmt.Errorf("destination missmatch=%v, want %v", route.Route, testCase.Route)
+			}
+			if testCase.Rewrite != nil {
+				if reflect.DeepEqual(route.Rewrite, testCase.Rewrite) != testCase.WantMatch {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("destination missmatch=%v, want %v", route.Rewrite, testCase.Rewrite)
+				}
 			}
 
 			details = append(details, fmt.Sprintf("PASS input:[%v]", input))
