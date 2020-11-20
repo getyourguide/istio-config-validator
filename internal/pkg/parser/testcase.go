@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 
 	"github.com/ghodss/yaml"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
@@ -82,10 +83,15 @@ func (r *Request) Unfold() ([]Input, error) {
 		return out, ErrEmptyURIList
 	}
 
-	for _, auth := range r.Authority {
-		for _, method := range r.Method {
-			for _, uri := range r.URI {
-				out = append(out, Input{Authority: auth, Method: method, URI: uri, Headers: r.Headers})
+	for _, uri := range r.URI {
+		u, err := url.Parse(uri)
+		if err != nil {
+			return out, err
+		}
+
+		for _, auth := range r.Authority {
+			for _, method := range r.Method {
+				out = append(out, Input{Authority: auth, Method: method, URI: u.Path, Headers: r.Headers})
 			}
 		}
 	}
