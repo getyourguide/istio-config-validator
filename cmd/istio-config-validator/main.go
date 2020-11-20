@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"istio.io/pkg/log"
+	"log"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/unit"
 )

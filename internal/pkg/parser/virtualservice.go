@@ -7,6 +7,8 @@ import (
 
 	"github.com/ghodss/yaml"
 	"go.uber.org/zap/zapcore"
+	"istio.io/istio/pilot/pkg/config/kube/crd"
+	"istio.io/istio/pkg/config"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
@@ -47,6 +49,28 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 		}
 
 		out = append(out, virtualService)
+	}
+
+	return out, nil
+}
+
+// ParseVirtualServices receives a list of file paths and returns the parsed config to be used by Istio
+func ParseVirtualServices(files []string) ([]config.Config, error) {
+	out := []config.Config{}
+	var inputs string
+
+	for _, file := range files {
+		fileContent, err := ioutil.ReadFile(file)
+		if err != nil {
+			return []config.Config{}, fmt.Errorf("reading file '%s' failed: %w", file, err)
+		}
+		inputs = fmt.Sprintf("%s\n---\n%s", inputs, string(fileContent))
+	}
+	fmt.Println(inputs)
+	out, _, err := crd.ParseInputs(inputs)
+
+	if err != nil {
+		return out, err
 	}
 
 	return out, nil
