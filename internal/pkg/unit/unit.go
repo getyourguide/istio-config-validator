@@ -28,14 +28,20 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 			return summary, details, err
 		}
 		for _, input := range inputs {
-			destinations, err := GetDestination(input, parsed.VirtualServices)
+			route, err := GetRoute(input, parsed.VirtualServices)
 			if err != nil {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 				return summary, details, fmt.Errorf("error getting destinations: %v", err)
 			}
-			if reflect.DeepEqual(destinations, testCase.Route) != testCase.WantMatch {
+			if reflect.DeepEqual(route.Route, testCase.Route) != testCase.WantMatch {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-				return summary, details, fmt.Errorf("destination missmatch=%v, want %v", destinations, testCase.Route)
+				return summary, details, fmt.Errorf("destination missmatch=%v, want %v", route.Route, testCase.Route)
+			}
+			if testCase.Rewrite != nil {
+				if reflect.DeepEqual(route.Rewrite, testCase.Rewrite) != testCase.WantMatch {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("rewrite missmatch=%v, want %v", route.Rewrite, testCase.Rewrite)
+				}
 			}
 
 			details = append(details, fmt.Sprintf("PASS input:[%v]", input))
@@ -49,9 +55,8 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 	return summary, details, nil
 }
 
-// GetDestination return the destination list for a given input, it evaluates matching rules in VirtualServices
-// related to the input based on it's hosts list.
-func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualService) ([]*networkingv1alpha3.HTTPRouteDestination, error) {
+// GetRoute returns the route that matched a given input.
+func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService) (*networkingv1alpha3.HTTPRoute, error) {
 	for _, vs := range virtualServices {
 		spec := vs.Spec
 		if !contains(spec.Hosts, input.Authority) {
@@ -60,19 +65,19 @@ func GetDestination(input parser.Input, virtualServices []*v1alpha3.VirtualServi
 
 		for _, httpRoute := range spec.Http {
 			if len(httpRoute.Match) == 0 {
-				return httpRoute.Route, nil
+				return httpRoute, nil
 			}
 			for _, matchBlock := range httpRoute.Match {
 				if match, err := matchRequest(input, matchBlock); err != nil {
-					return []*networkingv1alpha3.HTTPRouteDestination{}, err
+					return &networkingv1alpha3.HTTPRoute{}, err
 				} else if match {
-					return httpRoute.Route, nil
+					return httpRoute, nil
 				}
 			}
 		}
 	}
 
-	return []*networkingv1alpha3.HTTPRouteDestination{}, nil
+	return &networkingv1alpha3.HTTPRoute{}, nil
 }
 
 func contains(s []string, e string) bool {
