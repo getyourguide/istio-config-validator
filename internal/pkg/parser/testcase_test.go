@@ -465,6 +465,22 @@ func TestUnfoldRequest(t *testing.T) {
 			[]Input{},
 			ErrEmptyMethodList,
 		},
+		{
+			"query parameters should be removed",
+			Request{
+				Authority: []string{"www.example.com"},
+				Method:    []string{"POST"},
+				URI:       []string{"/reseller?partner_id=12344"},
+			},
+			[]Input{
+				{
+					Authority: "www.example.com",
+					Method:    "POST",
+					URI:       "/reseller",
+				},
+			},
+			nil,
+		},
 	}
 
 	for _, testCase := range testCases {
