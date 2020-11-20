@@ -45,7 +45,7 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 		err = json.Unmarshal(jsonBytes, virtualService)
 		if err != nil {
 			log.Debug("error while trying to unmarshal virtualservice", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
-			return out, fmt.Errorf("error while trying to unmarshal virtualservice (%s): %s", file, err.Error())
+			return out, fmt.Errorf("error while trying to unmarshal virtualservice (%s): %w", file, err)
 		}
 
 		out = append(out, virtualService)
