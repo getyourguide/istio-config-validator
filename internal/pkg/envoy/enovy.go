@@ -3,6 +3,7 @@ package envoy
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"testing"
 
 	"github.com/golang/protobuf/jsonpb"
@@ -17,25 +18,26 @@ import (
 
 func Generate(proxyType model.NodeType, configs []config.Config) {
 	s, proxy := SetupTest("", configs)
-	for _, c := range s.Clusters(proxy) {
-		fmt.Printf("clusterName:%s\n", c.GetName())
-	}
 
 	// To determine which routes to generate, first gen listeners once (not part of benchmark) and extract routes
 	l := s.Discovery.ConfigGenerator.BuildListeners(proxy, s.PushContext())
-	for _, r := range s.Routes(proxy) {
-		fmt.Printf("route:%s\n", r.GetName())
-	}
 	routeNames := xdstest.ExtractRoutesFromListeners(l)
 	if len(routeNames) == 0 {
 		log.Fatal("Got no route names!")
 	}
-	c := s.Discovery.Generators[v3.RouteType].Generate(proxy, s.PushContext(), &model.WatchedResource{ResourceNames: routeNames}, nil)
+	generator, ok := s.Discovery.Generators[v3.RouteType]
+	if !ok {
+		log.Fatal("cannot find generator for %s", v3.RouteType)
+	}
+	c := generator.Generate(proxy, s.PushContext(), &model.WatchedResource{ResourceNames: routeNames}, nil)
 	for i, r := range c {
-		s, err := (&jsonpb.Marshaler{Indent: "  "}).MarshalToString(r)
+		s, err := (&jsonpb.Marshaler{}).MarshalToString(r)
 		if err != nil {
 			log.Fatal(err)
 		}
+		// workaround to remove part of string generated that is not accepted by route config check tool
+		// find a better way for doing it.
+		s = strings.Replace(s, `"@type":"type.googleapis.com/envoy.config.route.v3.RouteConfiguration",`, "", 1)
 
 		fileName := fmt.Sprintf("/tmp/examples/route-%v.json", routeNames[i])
 		err = ioutil.WriteFile(fileName, []byte(s), 0644)
@@ -68,8 +70,7 @@ func SetupTest(proxyType model.NodeType, configs []config.Config) (*xds.FakeDisc
 			},
 			IstioVersion: "1.9.0",
 		},
-		// TODO: if you update this, make sure telemetry.yaml is also updated
-		IstioVersion:    &model.IstioVersion{Major: 1, Minor: 6},
+		IstioVersion:    &model.IstioVersion{Major: 1, Minor: 8},
 		ConfigNamespace: "default",
 	}
 
