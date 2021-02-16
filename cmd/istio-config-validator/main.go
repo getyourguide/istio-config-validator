@@ -75,6 +75,6 @@ func getFiles(names []string) []string {
 }
 
 func isYaml(info os.FileInfo) bool {
-	var extension = filepath.Ext(info.Name())
+	extension := filepath.Ext(info.Name())
 	return extension == ".yaml" || extension == ".yml"
 }
