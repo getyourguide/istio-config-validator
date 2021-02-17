@@ -65,11 +65,16 @@ func getFiles(names []string) []string {
 			if err != nil {
 				log.Fatal(err.Error())
 			}
-			if !info.IsDir() {
+			if !info.IsDir() && isYaml(info) {
 				files = append(files, path)
 			}
 			return nil
 		})
 	}
 	return files
+}
+
+func isYaml(info os.FileInfo) bool {
+	extension := filepath.Ext(info.Name())
+	return extension == ".yaml" || extension == ".yml"
 }
