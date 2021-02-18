@@ -444,8 +444,7 @@ istio.io/pkg v0.0.0-20200526141228-3772d4c49765/go.mod h1:EwvmercDF5DLCg5qUQlkM4
 k8s.io/api v0.18.1/go.mod h1:3My4jorQWzSs5a+l7Ge6JBbIxChLnY8HnuT58ZWolss=
 k8s.io/apimachinery v0.18.1 h1:hKPYcQRPLQoG2e7fKkVl0YCvm9TBefXTfGILa9vjVVk=
 k8s.io/apimachinery v0.18.1/go.mod h1:9SnR/e11v5IbyPCGbvJViimtJ0SwHG4nfZFjU77ftcA=
-k8s.io/apimachinery v0.20.2 h1:hFx6Sbt1oG0n6DZ+g4bFt5f6BoMkOjKWsQFu077M3Vg=
-k8s.io/apimachinery v0.20.2/go.mod h1:WlLqWAHZGg07AeltaI0MV5uk1Omp8xaN0JGLY6gkRpU=
+k8s.io/apimachinery v0.20.3 h1:P0heYNTI2km9gTUAb0PX5qRd8oHAaesICvkg13k97y4=
 k8s.io/apimachinery v0.20.3/go.mod h1:WlLqWAHZGg07AeltaI0MV5uk1Omp8xaN0JGLY6gkRpU=
 k8s.io/client-go v0.18.1/go.mod h1:iCikYRiXOj/yRRFE/aWqrpPtDt4P2JVWhtHkmESTcfY=
 k8s.io/gengo v0.0.0-20190128074634-0689ccc1d7d6/go.mod h1:ezvh/TsK7cY6rbqRK0oQQ8IAqLxYwwyPxAX1Pzy0ii0=
