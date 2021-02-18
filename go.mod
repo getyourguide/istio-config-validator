@@ -10,5 +10,5 @@ require (
 	istio.io/api v0.0.0-20200518162646-2c1705ec4d0b
 	istio.io/client-go v0.0.0-20200518164621-ef682e2929e5
 	istio.io/pkg v0.0.0-20200526141228-3772d4c49765
-	k8s.io/apimachinery v0.20.2
+	k8s.io/apimachinery v0.20.3
 )
