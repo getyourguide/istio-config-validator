@@ -43,3 +43,19 @@ testCases:
         host: catalog.catalog.svc.cluster.local
     rewrite:
       uri: "/catalog"
+  - description: Return 403 for bot traffic
+    wantMatch: true
+    request:
+      authority: ["example.com"]
+      method: ["PUT", "POST", "PATCH"]
+      uri: ["/reseller"]
+      headers:
+        x-request-class: bot
+    route:
+    - destination:
+        host: partner.partner.svc.cluster.local
+    fault:
+      abort:
+        percentage:
+          value: 100
+        httpStatus: 403

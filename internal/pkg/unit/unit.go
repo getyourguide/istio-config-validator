@@ -43,6 +43,12 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 					return summary, details, fmt.Errorf("rewrite missmatch=%v, want %v", route.Rewrite, testCase.Rewrite)
 				}
 			}
+			if testCase.Fault != nil {
+				if reflect.DeepEqual(route.Fault, testCase.Fault) != testCase.WantMatch {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("fault missmatch=%v, want %v", route.Fault, testCase.Fault)
+				}
+			}
 
 			details = append(details, fmt.Sprintf("PASS input:[%v]", input))
 		}
