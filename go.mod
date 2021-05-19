@@ -20,7 +20,7 @@ require (
 	google.golang.org/genproto v0.0.0-20210513213006-bf773b8c8384 // indirect
 	google.golang.org/grpc v1.37.1 // indirect
 	istio.io/api v0.0.0-20210517023434-1b15945e4010
-	istio.io/client-go v1.9.4
+	istio.io/client-go v1.10.0
 	istio.io/gogo-genproto v0.0.0-20210507141907-e3df4fbe806d // indirect
 	istio.io/pkg v0.0.0-20210507141752-561708e8ddd0
 	k8s.io/apimachinery v0.21.1
