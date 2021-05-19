@@ -31,6 +31,20 @@ spec:
     - match:
         - uri:
             prefix: /reseller
+          headers:
+            x-request-class:
+              exact: bot
+      route:
+        - destination:
+            host: partner.partner.svc.cluster.local
+      fault:
+        abort:
+          percentage:
+            value: 100
+          httpStatus: 403
+    - match:
+        - uri:
+            prefix: /reseller
       route:
         - destination:
             host: partner.partner.svc.cluster.local

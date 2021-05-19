@@ -32,7 +32,8 @@ type TestCase struct {
 	Route       []*networkingv1alpha3.HTTPRouteDestination `yaml:"route"`
 	Redirect    *networkingv1alpha3.HTTPRedirect           `yaml:"redirect"`
 	Rewrite     *networkingv1alpha3.HTTPRewrite            `yaml:"rewrite"`
-	WantMatch   bool                                       `yam:"wantMatch"`
+	Fault       *networkingv1alpha3.HTTPFaultInjection     `yaml:"fault"`
+	WantMatch   bool                                       `yaml:"wantMatch"`
 }
 
 // Request define the crafted http request present in the test case file.
