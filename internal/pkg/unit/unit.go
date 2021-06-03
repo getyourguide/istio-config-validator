@@ -49,6 +49,12 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 					return summary, details, fmt.Errorf("fault missmatch=%v, want %v", route.Fault, testCase.Fault)
 				}
 			}
+			if testCase.Headers != nil {
+				if reflect.DeepEqual(route.Headers, testCase.Headers) != testCase.WantMatch {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("headers missmatch=%v, want %v", route.Headers, testCase.Headers)
+				}
+			}
 
 			details = append(details, fmt.Sprintf("PASS input:[%v]", input))
 		}

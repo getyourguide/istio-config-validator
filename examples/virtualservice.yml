@@ -18,6 +18,10 @@ spec:
             host: users.users.svc.cluster.local
             port:
               number: 80
+      headers:
+        request:
+          set:
+            x-custom-header: ok
     - match:
         - uri:
             prefix: /partners
