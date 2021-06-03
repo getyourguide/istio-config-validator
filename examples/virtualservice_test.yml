@@ -12,6 +12,10 @@ testCases:
         host: users.users.svc.cluster.local
         port:
           number: 80
+    headers:
+      request:
+        set:
+          x-custom-header: ok
   - description: Partner service only accepts GET or OPTIONS
     wantMatch: false
     request:
