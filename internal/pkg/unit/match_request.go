@@ -32,7 +32,9 @@ func (sm *ExtendedStringMatch) Match(s string) (bool, error) {
 	case sm.GetPrefix() != "":
 		return strings.HasPrefix(s, sm.GetPrefix()), nil
 	case sm.GetRegex() != "":
-		r, err := regexp.Compile(sm.GetRegex())
+		// The rule will not match if only a subsequence of the string matches the regex.
+		// https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-routematch-safe-regex
+		r, err := regexp.Compile("^" + sm.GetRegex() + "$")
 		if err != nil {
 			return false, fmt.Errorf("could not compile regex %s: %v", sm.GetRegex(), err)
 		}

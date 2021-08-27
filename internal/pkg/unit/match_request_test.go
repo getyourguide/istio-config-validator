@@ -84,11 +84,11 @@ func Test_matchRequest(t *testing.T) {
 	}, {
 		name: "single match regex (true)",
 		args: args{
-			input: parser.Input{Authority: "www.example.com", URI: "/regex/test", Method: "POST"},
+			input: parser.Input{Authority: "www.example.com", URI: "/regex/", Method: "POST"},
 			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
 				Uri: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Regex{
-						Regex: "/reg.+?(/)",
+						Regex: "^/reg.+?(/)$",
 					},
 				},
 			},
@@ -177,6 +177,20 @@ func Test_matchRequest(t *testing.T) {
 				Uri: &networkingv1alpha3.StringMatch{
 					MatchType: &networkingv1alpha3.StringMatch_Regex{
 						Regex: "/reg(/)",
+					},
+				},
+			},
+		},
+		want:    false,
+		wantErr: false,
+	}, {
+		name: "single match partial regex (false)",
+		args: args{
+			input: parser.Input{Authority: "www.example.com", URI: "/regex", Method: "PATCH"},
+			httpMatchRequest: &networkingv1alpha3.HTTPMatchRequest{
+				Uri: &networkingv1alpha3.StringMatch{
+					MatchType: &networkingv1alpha3.StringMatch_Regex{
+						Regex: "/reg",
 					},
 				},
 			},
