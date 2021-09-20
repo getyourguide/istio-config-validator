@@ -19,5 +19,5 @@ require (
 	istio.io/client-go v1.11.2
 	istio.io/gogo-genproto v0.0.0-20210507141907-e3df4fbe806d // indirect
 	istio.io/pkg v0.0.0-20210507141752-561708e8ddd0
-	k8s.io/apimachinery v0.22.1
+	k8s.io/apimachinery v0.22.2
 )
