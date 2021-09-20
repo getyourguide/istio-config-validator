@@ -29,18 +29,21 @@ jobs:
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
         go get -u golang.org/x/lint/golint
+        go mod tidy
         golint -set_exit_status ./...
     - name: staticcheck.io
       if: matrix.platform == 'ubuntu-latest'
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
         go get honnef.co/go/tools/cmd/staticcheck
+        go mod tidy
         staticcheck -checks all ./...
     - name: gofumports formatting
       if: matrix.platform == 'ubuntu-latest'
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
         go get mvdan.cc/gofumpt/gofumports
+        go mod tidy
         gofumports -d .
         [ -z "$(gofumports -l .)" ]
     - name: Test
