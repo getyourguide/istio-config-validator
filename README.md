@@ -68,7 +68,7 @@ Have a look in the [TestCase Reference](docs/test-cases.md) to learn more how to
 ## Installation
 Either install the go package
 ```
-# go get -u github.com/getyourguide/istio-config-validator/cmd/istio-config-validator
+# go install github.com/getyourguide/istio-config-validator/cmd/istio-config-validator@latest
 ```
 Or alternatively install the docker image
 ```
