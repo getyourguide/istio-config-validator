@@ -15,8 +15,8 @@ require (
 	google.golang.org/api v0.46.0 // indirect
 	google.golang.org/genproto v0.0.0-20210513213006-bf773b8c8384 // indirect
 	google.golang.org/grpc v1.37.1 // indirect
-	istio.io/api v0.0.0-20211012192923-310f2a3f3c76
-	istio.io/client-go v1.11.4
+	istio.io/api v0.0.0-20211118170605-3f0f902cdfd1
+	istio.io/client-go v1.12.0
 	istio.io/gogo-genproto v0.0.0-20210507141907-e3df4fbe806d // indirect
 	istio.io/pkg v0.0.0-20210507141752-561708e8ddd0
 	k8s.io/apimachinery v0.22.3
