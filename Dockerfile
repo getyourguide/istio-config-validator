@@ -1,4 +1,4 @@
-FROM golang:alpine AS builder
+FROM golang:1.17-alpine AS builder
 RUN apk update && apk add --no-cache git
 WORKDIR $GOPATH/src/istio-config-validator/
 COPY . .
