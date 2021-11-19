@@ -6,7 +6,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.15.x, 1.16.x]
+        go-version: [1.17.x, 1.16.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -28,24 +28,21 @@ jobs:
       if: matrix.platform == 'ubuntu-latest'
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
-        go get -u golang.org/x/lint/golint
-        go mod tidy
+        go install golang.org/x/lint/golint@latest
         golint -set_exit_status ./...
     - name: staticcheck.io
       if: matrix.platform == 'ubuntu-latest'
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
-        go get honnef.co/go/tools/cmd/staticcheck
-        go mod tidy
+        go install honnef.co/go/tools/cmd/staticcheck@latest
         staticcheck -checks all ./...
-    - name: gofumports formatting
+    - name: gofumpt formatting
       if: matrix.platform == 'ubuntu-latest'
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
-        go get mvdan.cc/gofumpt/gofumports
-        go mod tidy
-        gofumports -d .
-        [ -z "$(gofumports -l .)" ]
+        go install mvdan.cc/gofumpt@latest
+        gofumpt -d .
+        [ -z "$(gofumpt -l .)" ]
     - name: Test
       run: go test -count=1 ./...
     - name: Test with -race
@@ -54,7 +51,6 @@ jobs:
       if: matrix.platform == 'ubuntu-latest'
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
-        go get -u github.com/schrej/godacov
-        go mod tidy
+        go install github.com/schrej/godacov@latest
         go test -coverprofile=./coverage.out ./...
         godacov -r ./coverage.out -t ${{ secrets.CODACY_PROJECT_TOKEN }} -c ${{ github.sha }}
