@@ -12,7 +12,7 @@ require (
 	istio.io/api v0.0.0-20211222040858-259e0a4587d3
 	istio.io/client-go v1.12.1
 	istio.io/pkg v0.0.0-20211222041310-9392eb0bfb51
-	k8s.io/apimachinery v0.23.0
+	k8s.io/apimachinery v0.23.1
 )
 
 require (
@@ -40,7 +40,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/net v0.0.0-20210825183410-e898025ed96a // indirect
+	golang.org/x/net v0.0.0-20211209124913-491a49abca63 // indirect
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359 // indirect
