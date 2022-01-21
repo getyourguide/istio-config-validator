@@ -12,7 +12,7 @@ require (
 	istio.io/api v0.0.0-20220120232141-9e2d15c4e3d3
 	istio.io/client-go v1.12.1
 	istio.io/pkg v0.0.0-20220120232442-4271deddc2ac
-	k8s.io/apimachinery v0.23.1
+	k8s.io/apimachinery v0.23.2
 )
 
 require (
@@ -57,5 +57,5 @@ require (
 	k8s.io/klog/v2 v2.30.0 // indirect
 	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b // indirect
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
 )
