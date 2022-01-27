@@ -47,10 +47,3 @@ jobs:
       run: go test -count=1 ./...
     - name: Test with -race
       run: go test -race -count=1 ./...
-    - name: Upload test coverage to codacy
-      if: matrix.platform == 'ubuntu-latest'
-      run: |
-        export PATH=$PATH:$(go env GOPATH)/bin
-        go install github.com/schrej/godacov@latest
-        go test -coverprofile=./coverage.out ./...
-        godacov -r ./coverage.out -t ${{ secrets.CODACY_PROJECT_TOKEN }} -c ${{ github.sha }}
