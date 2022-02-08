@@ -8,7 +8,7 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/multierr v1.7.0 // indirect
-	go.uber.org/zap v1.20.0
+	go.uber.org/zap v1.21.0
 	istio.io/api v0.0.0-20220203163703-135c864f3866
 	istio.io/client-go v1.12.2
 	istio.io/pkg v0.0.0-20220203154910-aa99fc270afc
