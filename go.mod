@@ -9,7 +9,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.21.0
-	istio.io/api v0.0.0-20220203163703-135c864f3866
+	istio.io/api v0.0.0-20220216143729-a5a786dc377c
 	istio.io/client-go v1.12.2
 	istio.io/pkg v0.0.0-20220207170018-228bb8afdbf9
 	k8s.io/apimachinery v0.23.3
