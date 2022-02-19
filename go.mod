@@ -10,7 +10,7 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.21.0
 	istio.io/api v0.0.0-20220216143729-a5a786dc377c
-	istio.io/client-go v1.12.2
+	istio.io/client-go v1.13.0
 	istio.io/pkg v0.0.0-20220218005410-1d45ba8be719
 	k8s.io/apimachinery v0.23.4
 )
