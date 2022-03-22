@@ -33,6 +33,8 @@ jobs:
     - name: staticcheck.io
       if: matrix.platform == 'ubuntu-latest'
       uses: dominikh/staticcheck-action@v1.1.0
+      with:
+        install-go: false
     - name: gofumpt formatting
       if: matrix.platform == 'ubuntu-latest'
       run: |
