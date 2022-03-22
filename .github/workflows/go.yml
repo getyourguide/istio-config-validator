@@ -32,10 +32,7 @@ jobs:
         golint -set_exit_status ./...
     - name: staticcheck.io
       if: matrix.platform == 'ubuntu-latest'
-      run: |
-        export PATH=$PATH:$(go env GOPATH)/bin
-        go install honnef.co/go/tools/cmd/staticcheck@latest
-        staticcheck -checks all ./...
+      uses: dominikh/staticcheck-action@v1.1.0
     - name: gofumpt formatting
       if: matrix.platform == 'ubuntu-latest'
       run: |
