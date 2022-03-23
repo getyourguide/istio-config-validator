@@ -11,7 +11,7 @@ require (
 	go.uber.org/zap v1.21.0
 	istio.io/api v0.0.0-20220304230428-0cdff8a2764f
 	istio.io/client-go v1.13.2
-	istio.io/pkg v0.0.0-20220308183142-ea9d1856f85b
+	istio.io/pkg v0.0.0-20220322234640-8bd2be3bd82a
 	k8s.io/apimachinery v0.23.5
 )
 
