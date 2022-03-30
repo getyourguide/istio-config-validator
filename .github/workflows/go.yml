@@ -6,7 +6,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.17.x]
+        go-version: [1.18.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -32,10 +32,9 @@ jobs:
         golint -set_exit_status ./...
     - name: staticcheck.io
       if: matrix.platform == 'ubuntu-latest'
-      run: |
-        export PATH=$PATH:$(go env GOPATH)/bin
-        go install honnef.co/go/tools/cmd/staticcheck@latest
-        staticcheck -checks all ./...
+      uses: dominikh/staticcheck-action@v1.1.0
+      with:
+        install-go: false
     - name: gofumpt formatting
       if: matrix.platform == 'ubuntu-latest'
       run: |
