@@ -32,7 +32,7 @@ jobs:
         golint -set_exit_status ./...
     - name: staticcheck.io
       if: matrix.platform == 'ubuntu-latest'
-      uses: dominikh/staticcheck-action@v1.1.0
+      uses: dominikh/staticcheck-action@v1.2.0
       with:
         install-go: false
     - name: gofumpt formatting
