@@ -70,7 +70,7 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 // GetRoute returns the route that matched a given input.
 func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService) (*networkingv1alpha3.HTTPRoute, error) {
 	for _, vs := range virtualServices {
-		spec := vs.Spec
+		spec := &vs.Spec
 		if !contains(spec.Hosts, input.Authority) {
 			continue
 		}
