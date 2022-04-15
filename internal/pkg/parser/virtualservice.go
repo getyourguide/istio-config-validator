@@ -26,7 +26,7 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 		decoder := yamlV3.NewDecoder(strings.NewReader(string(fileContent)))
 
 		for {
-			// Reading into interface first. Decoding directly into struct results does not work for Uri StringMatch types
+			// Reading into interface first. Decoding directly into struct does not work for Uri StringMatch types
 			var vsInterface interface{}
 
 			if err = decoder.Decode(&vsInterface); err != nil {
