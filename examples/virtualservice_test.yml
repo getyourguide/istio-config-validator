@@ -25,6 +25,8 @@ testCases:
     route:
     - destination:
         host: partner.partner.svc.cluster.local
+---
+testCases:
   - description: Reseller is rewritten as partner
     wantMatch: true
     request:
