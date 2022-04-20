@@ -6,7 +6,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/stretchr/testify v1.7.1
 	go.uber.org/zap v1.21.0
-	istio.io/api v0.0.0-20220413180505-1574de06b7bd
+	istio.io/api v0.0.0-20220419151115-0e003b5fce24
 	istio.io/client-go v1.13.3
 	istio.io/pkg v0.0.0-20220418200614-813ce651e422
 	k8s.io/apimachinery v0.23.5
@@ -48,7 +48,6 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
-	istio.io/gogo-genproto v0.0.0-20211208193508-5ab4acc9eb1e // indirect
 	k8s.io/klog/v2 v2.60.1 // indirect
 	k8s.io/utils v0.0.0-20211116205334-6203023598ed // indirect
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
