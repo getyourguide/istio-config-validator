@@ -128,7 +128,7 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 				return out, fmt.Errorf("error while trying to unmarshal into interface (%s): %w", file, err)
 			}
 
-			jsonBytes, err := json.Marshal(fileContent)
+			jsonBytes, err := json.Marshal(testcaseInterface)
 			if err != nil {
 				return []*TestCase{}, fmt.Errorf("yamltojson conversion failed for file '%s': %w", file, err)
 			}
