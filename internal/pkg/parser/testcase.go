@@ -124,7 +124,7 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 					break
 				}
 
-				log.Debug("error while trying to unmarshal into interface", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+				log.Debugf("error while trying to unmarshal into interface", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
 				return out, fmt.Errorf("error while trying to unmarshal into interface (%s): %w", file, err)
 			}
 
