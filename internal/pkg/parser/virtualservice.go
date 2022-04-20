@@ -40,7 +40,6 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 			}
 
 			jsonBytes, err := json.Marshal(vsInterface)
-
 			if err != nil {
 				log.Debug("error while trying to marshal to json", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
 				return out, fmt.Errorf("error while trying to marshal to json (%s): %w", file, err)

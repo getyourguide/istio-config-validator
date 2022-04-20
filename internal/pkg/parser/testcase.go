@@ -4,11 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/url"
+	"strings"
 
-	"github.com/ghodss/yaml"
+	"go.uber.org/zap/zapcore"
+	yamlV3 "gopkg.in/yaml.v3"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
+	"istio.io/pkg/log"
 )
 
 var (
@@ -110,23 +114,39 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 			return []*TestCase{}, fmt.Errorf("reading file '%s' failed: %w", file, err)
 		}
 
-		// we need to transform yaml to json so the marshaler from istio works
-		jsonBytes, err := yaml.YAMLToJSON(fileContent)
-		if err != nil {
-			return []*TestCase{}, fmt.Errorf("yamltojson conversion failed for file '%s': %w", file, err)
-		}
+		decoder := yamlV3.NewDecoder(strings.NewReader(string(fileContent)))
 
-		yamlFile := &TestCaseYAML{}
-		err = json.Unmarshal(jsonBytes, yamlFile)
-		if err != nil {
-			return []*TestCase{}, fmt.Errorf("unmarshaling failed for file '%s': %w", file, err)
-		}
+		for {
+			var testcaseInterface interface{}
 
-		if len(yamlFile.TestCases) == 0 {
-			continue
-		}
+			if err = decoder.Decode(&testcaseInterface); err != nil {
+				if errors.Is(err, io.EOF) {
+					break
+				}
 
-		out = append(out, yamlFile.TestCases...)
+				log.Debugf("error while trying to unmarshal into interface", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+				return out, fmt.Errorf("error while trying to unmarshal into interface (%s): %w", file, err)
+			}
+
+			jsonBytes, err := json.Marshal(testcaseInterface)
+			if err != nil {
+				return []*TestCase{}, fmt.Errorf("yamltojson conversion failed for file '%s': %w", file, err)
+			}
+
+			yamlFile := &TestCaseYAML{}
+			err = json.Unmarshal(jsonBytes, yamlFile)
+			if err != nil {
+				log.Debugf("unmarshaling failed for file '%s': %w", file, err)
+				continue
+
+			}
+
+			if len(yamlFile.TestCases) == 0 {
+				continue
+			}
+
+			out = append(out, yamlFile.TestCases...)
+		}
 	}
 	return out, nil
 }
