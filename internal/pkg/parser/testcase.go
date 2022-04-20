@@ -136,7 +136,7 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 			yamlFile := &TestCaseYAML{}
 			err = json.Unmarshal(jsonBytes, yamlFile)
 			if err != nil {
-				log.Debug("unmarshaling failed for file '%s': %w", file, err)
+				log.Debugf("unmarshaling failed for file '%s': %w", file, err)
 				continue
 
 			}
