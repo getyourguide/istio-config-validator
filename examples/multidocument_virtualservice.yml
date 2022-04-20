@@ -1,0 +1,72 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: example
+  namespace: example
+spec:
+  gateways:
+    - mesh
+  hosts:
+    - www.example.com
+    - example.com
+  http:
+    - match:
+        - uri:
+            regex: /users(/.*)?
+      route:
+        - destination:
+            host: users.users.svc.cluster.local
+            port:
+              number: 80
+      headers:
+        request:
+          set:
+            x-custom-header: ok
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: example
+  namespace: example
+spec:
+  gateways:
+    - mesh
+  hosts:
+    - www.example.com
+    - example.com
+  http:
+    - match:
+        - uri:
+            prefix: /partners
+          method:
+            regex: (GET|OPTIONS)
+      route:
+        - destination:
+            host: partner.partner.svc.cluster.local
+            port:
+              number: 8000
+    - match:
+        - uri:
+            prefix: /reseller
+          headers:
+            x-request-class:
+              exact: bot
+      route:
+        - destination:
+            host: partner.partner.svc.cluster.local
+      fault:
+        abort:
+          percentage:
+            value: 100
+          httpStatus: 403
+    - match:
+        - uri:
+            prefix: /reseller
+      route:
+        - destination:
+            host: partner.partner.svc.cluster.local
+      rewrite:
+        uri: "/partner"
+    - route:
+        - destination:
+            host: monolith.monolith.svc.cluster.local
