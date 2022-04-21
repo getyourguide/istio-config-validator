@@ -137,12 +137,8 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 			err = json.Unmarshal(jsonBytes, yamlFile)
 			if err != nil {
 				log.Debugf("unmarshaling failed for file '%s': %w", file, err)
-				continue
+				return []*TestCase{}, err
 
-			}
-
-			if len(yamlFile.TestCases) == 0 {
-				continue
 			}
 
 			out = append(out, yamlFile.TestCases...)
