@@ -25,6 +25,9 @@ testCases:
     route:
     - destination:
         host: partner.partner.svc.cluster.local
+---
+# Multidoc test
+testCases:
   - description: Reseller is rewritten as partner
     wantMatch: true
     request:
