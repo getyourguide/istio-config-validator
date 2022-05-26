@@ -9,7 +9,7 @@ require (
 	istio.io/api v0.0.0-20220523183528-706b04d34c0f
 	istio.io/client-go v1.13.4
 	istio.io/pkg v0.0.0-20220523183728-f3d886a02c24
-	k8s.io/apimachinery v0.24.0
+	k8s.io/apimachinery v0.24.1
 )
 
 require (
