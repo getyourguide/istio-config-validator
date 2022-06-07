@@ -3,7 +3,7 @@ module github.com/getyourguide/istio-config-validator
 go 1.17
 
 require (
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.7.2
 	go.uber.org/zap v1.21.0
 	gopkg.in/yaml.v3 v3.0.1
 	istio.io/api v0.0.0-20220531010908-64602ec8d647
