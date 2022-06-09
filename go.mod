@@ -6,7 +6,7 @@ require (
 	github.com/stretchr/testify v1.7.2
 	go.uber.org/zap v1.21.0
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v0.0.0-20220531010908-64602ec8d647
+	istio.io/api v0.0.0-20220607213200-7f9bb4db4283
 	istio.io/client-go v1.13.4
 	istio.io/pkg v0.0.0-20220601164011-f9445c917eae
 	k8s.io/apimachinery v0.24.1
@@ -42,8 +42,8 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/api v0.73.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220323144105-ec3c684e5b14 // indirect
-	google.golang.org/grpc v1.45.0 // indirect
+	google.golang.org/genproto v0.0.0-20220531134929-86cf59382f1b // indirect
+	google.golang.org/grpc v1.46.2 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
