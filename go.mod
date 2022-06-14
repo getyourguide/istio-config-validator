@@ -6,9 +6,9 @@ require (
 	github.com/stretchr/testify v1.7.2
 	go.uber.org/zap v1.21.0
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v0.0.0-20220607213200-7f9bb4db4283
+	istio.io/api v0.0.0-20220613212509-31e03cf7a1a3
 	istio.io/client-go v1.13.4
-	istio.io/pkg v0.0.0-20220601164011-f9445c917eae
+	istio.io/pkg v0.0.0-20220613212709-20abe8501809
 	k8s.io/apimachinery v0.24.1
 )
 
@@ -51,4 +51,12 @@ require (
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9 // indirect
 	sigs.k8s.io/json v0.0.0-20211208200746-9f7c6b3444d2 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
+)
+
+replace (
+	golang.org/x/crypto => golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
+	golang.org/x/net => golang.org/x/net v0.0.0-20211209124913-491a49abca63
+	golang.org/x/text => golang.org/x/text v0.3.7
+	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v3 => gopkg.in/yaml.v3 v3.0.1
 )
