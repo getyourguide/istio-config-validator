@@ -57,6 +57,6 @@ replace (
 	golang.org/x/crypto => golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8
 	golang.org/x/net => golang.org/x/net v0.0.0-20220812174116-3211cb980234
 	golang.org/x/text => golang.org/x/text v0.3.7
-	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 => gopkg.in/yaml.v3 v3.0.1
 )
