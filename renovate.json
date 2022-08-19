@@ -5,5 +5,14 @@
   ],
   "postUpdateOptions": [
     "gomodTidy"
+  ],
+  "packageRules": [
+    {
+      "updateTypes": [
+        "digest",
+        "patch"
+      ],
+      "automerge": true
+    }
   ]
 }
