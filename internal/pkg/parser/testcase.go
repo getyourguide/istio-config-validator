@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/url"
+	"os"
 	"strings"
 
 	"go.uber.org/zap/zapcore"
@@ -109,7 +109,7 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 	out := []*TestCase{}
 
 	for _, file := range files {
-		fileContent, err := ioutil.ReadFile(file)
+		fileContent, err := os.ReadFile(file)
 		if err != nil {
 			return []*TestCase{}, fmt.Errorf("reading file '%s' failed: %w", file, err)
 		}

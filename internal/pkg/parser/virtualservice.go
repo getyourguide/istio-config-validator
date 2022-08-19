@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"go.uber.org/zap/zapcore"
@@ -18,7 +18,7 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 	out := []*v1alpha3.VirtualService{}
 
 	for _, file := range files {
-		fileContent, err := ioutil.ReadFile(file)
+		fileContent, err := os.ReadFile(file)
 		if err != nil {
 			return []*v1alpha3.VirtualService{}, fmt.Errorf("reading file '%s' failed: %w", file, err)
 		}
