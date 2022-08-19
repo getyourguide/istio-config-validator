@@ -70,12 +70,13 @@ type Port struct {
 
 // Unfold returns a list of Input objects constructed by all possibilities defined in the Request object. Ex:
 // Request{Authority: {"www.example.com", "example.com"}, Method: {"GET", "OPTIONS"}}
-// returns []Input{
-// 	{Authority:"www.example.com", Method: "GET"},
-// 	{Authority:"www.example.com", Method: "OPTIONS"}
-// 	{Authority:"example.com", Method: "GET"},
-// 	{Authority:"example.com", Method: "OPTIONS"},
-// }
+//
+//	returns []Input{
+//		{Authority:"www.example.com", Method: "GET"},
+//		{Authority:"www.example.com", Method: "OPTIONS"}
+//		{Authority:"example.com", Method: "GET"},
+//		{Authority:"example.com", Method: "OPTIONS"},
+//	}
 func (r *Request) Unfold() ([]Input, error) {
 	out := []Input{}
 
