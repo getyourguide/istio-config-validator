@@ -55,7 +55,7 @@ require (
 )
 
 replace (
-	golang.org/x/crypto => golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d
+	golang.org/x/crypto => golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b
 	golang.org/x/net => golang.org/x/net v0.0.0-20221004154528-8021a29435af
 	golang.org/x/text => golang.org/x/text v0.3.7
 	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.4.0
