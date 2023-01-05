@@ -21,5 +21,5 @@ jobs:
     - name: Build and push docker image
       uses: docker/build-push-action@v3
       with:
-        repository: getyourguide/istio-config-validator
-        tags: latest
+        push: true
+        tags: getyourguide/istio-config-validator:latest
