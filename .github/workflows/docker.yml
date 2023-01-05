@@ -11,10 +11,15 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    - name: Build and push docker image
-      uses: docker/build-push-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+    - name: Build and push docker image
+      uses: docker/build-push-action@v3
+      with:
         repository: getyourguide/istio-config-validator
-        tag_with_ref: true
+        tags: latest
