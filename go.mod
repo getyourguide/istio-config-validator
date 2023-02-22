@@ -6,7 +6,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.24.0
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v0.0.0-20230217183603-f07e07dec0b3
+	istio.io/api v0.0.0-20230222095133-c3fb44b462d8
 	istio.io/client-go v1.17.0
 	istio.io/pkg v0.0.0-20230215152750-5c54177a9d30
 	k8s.io/apimachinery v0.26.1
