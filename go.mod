@@ -8,7 +8,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	istio.io/api v0.0.0-20230322024321-49a8f67e977a
 	istio.io/client-go v1.17.1
-	istio.io/pkg v0.0.0-20230313170827-f8c589fa0294
+	istio.io/pkg v0.0.0-20230321153621-53ca9b2f1a0a
 	k8s.io/apimachinery v0.26.2
 )
 
