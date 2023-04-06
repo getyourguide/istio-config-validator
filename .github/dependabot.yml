@@ -1,6 +1,7 @@
 version: 2
 updates:
 - package-ecosystem: gomod
+  open-pull-requests-limit: 0 # only enable security updates
   directory: "/"
   schedule:
     interval: daily

@@ -1,0 +1,45 @@
+{
+    "constraints": {
+        "go": "1.20"
+    },
+    "extends": [
+        "config:base",
+        ":disableDependencyDashboard"
+    ],
+    "enabledManagers": [
+        "gomod"
+    ],
+    "postUpdateOptions": [
+        "gomodUpdateImportPaths",
+        "gomodMassage",
+        "gomodTidy"
+    ],
+    "automergeSchedule": [
+        "after 9am and before 6pm every weekday"
+    ],
+    "packageRules": [
+        {
+            "schedule": [
+                "after 9am and before 6pm on monday"
+            ],
+            "automerge": true,
+            "groupName": "Go minor dependencies updates (auto-merge)",
+            "updateTypes": [
+                "minor",
+                "patch",
+                "digest",
+                "pin",
+                "pinDigest"
+            ]
+        },
+        {
+            "schedule": [
+                "after 9am and before 6pm on monday"
+            ],
+            "updateTypes": [
+                "major"
+            ]
+        }
+    ],
+    "ignoreDeps": []
+}
