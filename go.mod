@@ -6,10 +6,10 @@ require (
 	github.com/stretchr/testify v1.8.2
 	go.uber.org/zap v1.24.0
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v0.0.0-20230410230800-a94614182296
+	istio.io/api v0.0.0-20230414193140-04eb39977e2a
 	istio.io/client-go v1.17.1
-	istio.io/pkg v0.0.0-20230411034200-2c98fd007de2
-	k8s.io/apimachinery v0.26.3
+	istio.io/pkg v0.0.0-20230414193540-2f73360f3fc6
+	k8s.io/apimachinery v0.27.1
 )
 
 require (
@@ -53,7 +53,7 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/klog/v2 v2.90.1 // indirect
-	k8s.io/utils v0.0.0-20221128185143-99ec85e7a448 // indirect
+	k8s.io/utils v0.0.0-20230209194617-a36077c30491 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 )
