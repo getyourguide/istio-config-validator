@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"go.uber.org/zap/zapcore"
+	"golang.org/x/exp/slog"
 	yamlV3 "gopkg.in/yaml.v3"
 	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
-	"istio.io/pkg/log"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -35,30 +35,30 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 					break
 				}
 
-				log.Debug("error while trying to unmarshal into interface", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+				slog.Debug("error while trying to unmarshal into interface", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
 				return out, fmt.Errorf("error while trying to unmarshal into interface (%s): %w", file, err)
 			}
 
 			jsonBytes, err := json.Marshal(vsInterface)
 			if err != nil {
-				log.Debug("error while trying to marshal to json", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+				slog.Debug("error while trying to marshal to json", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
 				return out, fmt.Errorf("error while trying to marshal to json (%s): %w", file, err)
 			}
 
 			meta := &v1.TypeMeta{}
 			if err = json.Unmarshal(jsonBytes, meta); err != nil {
-				log.Debug("error extracting the metadata of the virtualservice", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+				slog.Debug("error extracting the metadata of the virtualservice", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
 				continue
 			}
 
 			if meta.Kind != "VirtualService" {
-				log.Debug("file is not Kind VirtualService", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+				slog.Debug("file is not Kind VirtualService", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
 				continue
 			}
 
 			virtualService := &v1alpha3.VirtualService{}
 			if err = json.Unmarshal(jsonBytes, virtualService); err != nil {
-				log.Debug("error while trying to unmarshal virtualservice", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+				slog.Debug("error while trying to unmarshal virtualservice", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
 				return out, fmt.Errorf("error while trying to unmarshal virtualservice (%s): %w", file, err)
 			}
 
