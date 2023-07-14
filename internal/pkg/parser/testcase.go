@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"go.uber.org/zap/zapcore"
+	"golang.org/x/exp/slog"
 	yamlV3 "gopkg.in/yaml.v3"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
-	"istio.io/pkg/log"
 )
 
 var (
@@ -125,7 +125,7 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 					break
 				}
 
-				log.Debugf("error while trying to unmarshal into interface", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
+				slog.Debug("error while trying to unmarshal into interface", zapcore.Field{Key: "file", Type: zapcore.StringType, String: file})
 				return out, fmt.Errorf("error while trying to unmarshal into interface (%s): %w", file, err)
 			}
 
@@ -137,7 +137,7 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 			yamlFile := &TestCaseYAML{}
 			err = json.Unmarshal(jsonBytes, yamlFile)
 			if err != nil {
-				log.Debugf("unmarshaling failed for file '%s': %w", file, err)
+				slog.Debug("unmarshaling failed for file '%s': %w", file, err)
 				return []*TestCase{}, err
 
 			}
