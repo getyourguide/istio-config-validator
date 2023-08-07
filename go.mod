@@ -4,8 +4,8 @@ go 1.20
 
 require (
 	github.com/stretchr/testify v1.8.4
-	go.uber.org/zap v1.24.0
-	golang.org/x/exp v0.0.0-20230728194245-b0cb94b80691
+	go.uber.org/zap v1.25.0
+	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
 	gopkg.in/yaml.v3 v3.0.1
 	istio.io/api v1.19.0-alpha.1.0.20230629170101-1364cf24e4ab
 	istio.io/client-go v1.18.1
@@ -37,8 +37,7 @@ require (
 	github.com/spf13/cobra v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.uber.org/atomic v1.10.0 // indirect
-	go.uber.org/multierr v1.9.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
