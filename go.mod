@@ -5,9 +5,9 @@ go 1.20
 require (
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.25.0
-	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
+	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v1.19.0-alpha.1.0.20230629170101-1364cf24e4ab
+	istio.io/api v1.19.0-beta.0
 	istio.io/client-go v1.18.1
 	istio.io/pkg v0.0.0-20230523202533-240922a4c9ad
 	k8s.io/apimachinery v0.27.4
