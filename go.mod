@@ -5,10 +5,10 @@ go 1.21
 require (
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.25.0
-	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
+	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v1.19.0-rc.0
-	istio.io/client-go v1.18.1
+	istio.io/api v1.19.0
+	istio.io/client-go v1.19.0
 	istio.io/pkg v0.0.0-20230523202533-240922a4c9ad
 	k8s.io/apimachinery v0.28.1
 )
@@ -40,9 +40,9 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
-	golang.org/x/oauth2 v0.7.0 // indirect
+	golang.org/x/oauth2 v0.8.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
 	google.golang.org/api v0.120.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -55,5 +55,5 @@ require (
 	k8s.io/klog/v2 v2.100.1 // indirect
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.3.0 // indirect
 )
