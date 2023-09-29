@@ -28,6 +28,7 @@ type defaultFormat struct{}
 func (d defaultFormat) Fail(input parser.Input) string {
 	return fmt.Sprintf("FAIL input:[%v]", input)
 }
+
 func (d defaultFormat) Pass(input parser.Input) string {
 	return fmt.Sprintf("Pass input:[%v]", input)
 }

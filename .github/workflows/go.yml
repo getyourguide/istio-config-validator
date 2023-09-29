@@ -21,27 +21,11 @@ jobs:
         uname -a
         go version
         go env
-    - name: Vet
-      if: matrix.platform == 'ubuntu-latest'
-      run: go vet -v ./...
     - name: Lint
-      if: matrix.platform == 'ubuntu-latest'
-      run: |
-        export PATH=$PATH:$(go env GOPATH)/bin
-        go install golang.org/x/lint/golint@latest
-        golint -set_exit_status ./...
-    - name: staticcheck.io
-      if: matrix.platform == 'ubuntu-latest'
-      uses: dominikh/staticcheck-action@v1.3.0
+      uses: golangci/golangci-lint-action@v3
       with:
-        install-go: false
-    - name: gofumpt formatting
-      if: matrix.platform == 'ubuntu-latest'
-      run: |
-        export PATH=$PATH:$(go env GOPATH)/bin
-        go install mvdan.cc/gofumpt@latest
-        gofumpt -d .
-        [ -z "$(gofumpt -l .)" ]
+        skip-build-cache: true
+        skip-pkg-cache: true
     - name: Test
       run: go test -count=1 ./...
     - name: Test with -race
