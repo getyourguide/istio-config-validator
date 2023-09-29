@@ -15,7 +15,7 @@ import (
 )
 
 func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
-	out := []*v1alpha3.VirtualService{}
+	var out []*v1alpha3.VirtualService
 
 	for _, file := range files {
 		fileContent, err := os.ReadFile(file)

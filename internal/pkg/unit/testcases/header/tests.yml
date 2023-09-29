@@ -1,0 +1,33 @@
+TestCases:
+  - description: match headers with a variety of values
+    wantMatch: true
+    request:
+      authority: ["www.example.com"]
+      method: ["GET"]
+      uri: ["/headers/v1"]
+      headers:
+        x-custom-header: ok
+        x-prefix-header: start-with-prefix
+    route:
+      - destination:
+          host: has-header
+  - description: match a header by presence
+    wantMatch: true
+    request:
+      authority: ["www.example.com"]
+      method: ["GET"]
+      uri: ["/headers/v1"]
+      headers:
+        x-custom-header: ok
+    route:
+      - destination:
+          host: has-present-header
+  - description: missing headers goes to default
+    wantMatch: true
+    request:
+      authority: ["www.example.com"]
+      method: ["GET"]
+      uri: ["/headers/v1"]
+    route:
+      - destination:
+          host: default

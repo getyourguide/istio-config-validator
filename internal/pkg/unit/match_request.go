@@ -10,6 +10,37 @@ import (
 	"istio.io/api/networking/v1alpha3"
 )
 
+// MapMatcher checks map parameters, which requires executing multiple ExtendedStringMatch checks
+type MapMatcher struct {
+	matchers map[string]*v1alpha3.StringMatch
+}
+
+func (mm MapMatcher) Match(input map[string]string) (bool, error) {
+	for param, matcher := range mm.matchers {
+		value, exists := input[param]
+		if !exists {
+			return false, nil
+		}
+
+		if matcher.GetMatchType() == nil {
+			// match type exact: "", and {} checks for presence in query and headers respectively
+			continue
+		}
+
+		extendedMatcher := &ExtendedStringMatch{StringMatch: matcher}
+		matched, err := extendedMatcher.Match(value)
+		if err != nil {
+			return false, err
+		}
+
+		if !matched {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
 // ExtendedStringMatch copies istio ExtendedStringMatch definition and extends it to add helper methods.
 type ExtendedStringMatch struct {
 	*v1alpha3.StringMatch
@@ -26,12 +57,12 @@ func (sm *ExtendedStringMatch) Match(s string) (bool, error) {
 		return true, nil
 	}
 
-	switch {
-	case sm.GetExact() != "":
-		return sm.GetExact() == s, nil
-	case sm.GetPrefix() != "":
+	switch m := sm.GetMatchType().(type) {
+	case *v1alpha3.StringMatch_Exact:
+		return m.Exact == s, nil
+	case *v1alpha3.StringMatch_Prefix:
 		return strings.HasPrefix(s, sm.GetPrefix()), nil
-	case sm.GetRegex() != "":
+	case *v1alpha3.StringMatch_Regex:
 		// The rule will not match if only a subsequence of the string matches the regex.
 		// https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-routematch-safe-regex
 		r, err := regexp.Compile("^" + sm.GetRegex() + "$")
@@ -39,44 +70,45 @@ func (sm *ExtendedStringMatch) Match(s string) (bool, error) {
 			return false, fmt.Errorf("could not compile regex %s: %v", sm.GetRegex(), err)
 		}
 		return r.MatchString(s), nil
+	default:
+		return false, fmt.Errorf("unknown matcher type %T", sm.GetMatchType())
 	}
-	return false, nil
 }
 
 // matchRequest takes an Input and evaluates against a HTTPMatchRequest block. It replicates
 // Istio VirtualService semantic returning true when ALL conditions within the block are true.
 // TODO: Add support for all fields within a match block. The ones supported today are:
-// Authority, Uri, Method and Headers.
+// Authority, Uri, Method, Headers, Scheme, and QueryParams.
 func matchRequest(input parser.Input, httpMatchRequest *v1alpha3.HTTPMatchRequest) (bool, error) {
-	authority := &ExtendedStringMatch{httpMatchRequest.Authority}
 	uri := &ExtendedStringMatch{httpMatchRequest.Uri}
+	if matched, err := uri.Match(input.URI); !matched || err != nil {
+		return false, err
+	}
+
+	authority := &ExtendedStringMatch{httpMatchRequest.Authority}
+	if matched, err := authority.Match(input.Authority); !matched || err != nil {
+		return false, err
+	}
+
 	method := &ExtendedStringMatch{httpMatchRequest.Method}
-
-	for headerName, sm := range httpMatchRequest.Headers {
-		if _, ok := input.Headers[headerName]; !ok {
-			return false, nil
-		}
-		header := &ExtendedStringMatch{sm}
-		match, err := header.Match(input.Headers[headerName])
-		if err != nil {
-			return false, err
-		}
-		if !match {
-			return false, nil
-		}
+	if matched, err := method.Match(input.Method); !matched || err != nil {
+		return false, err
 	}
 
-	uriMatch, err := uri.Match(input.URI)
-	if err != nil {
+	scheme := &ExtendedStringMatch{httpMatchRequest.Scheme}
+	if matched, err := scheme.Match(input.Scheme); !matched || err != nil {
 		return false, err
 	}
-	authorityMatch, err := authority.Match(input.Authority)
-	if err != nil {
+
+	headers := &MapMatcher{matchers: httpMatchRequest.Headers}
+	if matched, err := headers.Match(input.Headers); !matched || err != nil {
 		return false, err
 	}
-	methodMatch, err := method.Match(input.Method)
-	if err != nil {
+
+	query := &MapMatcher{matchers: httpMatchRequest.QueryParams}
+	if matched, err := query.Match(input.QueryParams); !matched || err != nil {
 		return false, err
 	}
-	return authorityMatch && uriMatch && methodMatch, nil
+
+	return true, nil
 }

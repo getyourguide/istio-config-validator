@@ -43,18 +43,23 @@ type TestCase struct {
 
 // Request define the crafted http request present in the test case file.
 type Request struct {
-	Authority []string          `yaml:"authority"`
-	Method    []string          `yaml:"method"`
-	URI       []string          `yaml:"uri"`
-	Headers   map[string]string `yaml:"headers"`
+	Authority []string `yaml:"authority"`
+	Method    []string `yaml:"method"`
+	URI       []string `yaml:"uri"`
+	// optional fields
+	Headers     map[string]string `yaml:"headers"`
+	QueryParams map[string]string `yaml:"queryParams"`
+	Scheme      string            `yaml:"scheme"`
 }
 
 // Input contains the data structure which will be used to assert
 type Input struct {
-	Authority string
-	Method    string
-	URI       string
-	Headers   map[string]string
+	Authority   string
+	Method      string
+	URI         string
+	Headers     map[string]string
+	Scheme      string
+	QueryParams map[string]string
 }
 
 // Destination define the destination we should assert
@@ -78,7 +83,7 @@ type Port struct {
 //		{Authority:"example.com", Method: "OPTIONS"},
 //	}
 func (r *Request) Unfold() ([]Input, error) {
-	out := []Input{}
+	var out []Input
 
 	if len(r.Authority) == 0 {
 		return out, ErrEmptyAuthorityList
@@ -98,7 +103,14 @@ func (r *Request) Unfold() ([]Input, error) {
 
 		for _, auth := range r.Authority {
 			for _, method := range r.Method {
-				out = append(out, Input{Authority: auth, Method: method, URI: u.Path, Headers: r.Headers})
+				out = append(out, Input{
+					Authority:   auth,
+					Method:      method,
+					URI:         u.Path,
+					Headers:     r.Headers,
+					QueryParams: r.QueryParams,
+					Scheme:      r.Scheme,
+				})
 			}
 		}
 	}
@@ -107,7 +119,7 @@ func (r *Request) Unfold() ([]Input, error) {
 }
 
 func parseTestCases(files []string) ([]*TestCase, error) {
-	out := []*TestCase{}
+	var out []*TestCase
 
 	for _, file := range files {
 		fileContent, err := os.ReadFile(file)
@@ -137,7 +149,7 @@ func parseTestCases(files []string) ([]*TestCase, error) {
 			yamlFile := &TestCaseYAML{}
 			err = json.Unmarshal(jsonBytes, yamlFile)
 			if err != nil {
-				slog.Debug("unmarshaling failed for file '%s': %w", file, err)
+				slog.Debug("unmarshalling failed for file '%s': %w", file, err)
 				return []*TestCase{}, err
 
 			}

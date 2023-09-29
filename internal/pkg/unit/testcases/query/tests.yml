@@ -1,0 +1,26 @@
+TestCases:
+  - description: match query parameters in multiple ways
+    wantMatch: true
+    request:
+      authority: ["www.example.com"]
+      method: ["GET"]
+      uri: ["/queries/v1"]
+      queryParams:
+        prefixMatch: prefixed-query-param
+        exactMatch: name-matches
+        version:
+    route:
+      - destination:
+          host: full.query.svc.cluster.local
+  - description: no match if a query parameter is missing
+    wantMatch: true
+    request:
+      authority: ["www.example.com"]
+      method: ["GET"]
+      uri: ["/queries/v1"]
+      queryParams:
+        exactMatch: name-matches
+        version:
+    route:
+      - destination:
+          host: partial.query.svc.cluster.local

@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: scheme
+  namespace: scheme
+spec:
+  gateways:
+    - mesh
+  hosts:
+    - scheme.com
+  http:
+    - match:
+      - scheme:
+          exact: https
+      route:
+        - destination:
+            host: has-https
+    - match:
+      route:
+        - destination:
+            host: http
