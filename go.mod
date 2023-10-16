@@ -7,9 +7,9 @@ require (
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v1.19.1
-	istio.io/client-go v1.19.1
-	istio.io/pkg v0.0.0-20230523202533-240922a4c9ad
+	istio.io/api v1.19.3
+	istio.io/client-go v1.19.3
+	istio.io/pkg v0.0.0-20231012032344-12c123223b71
 	k8s.io/apimachinery v0.28.2
 )
 
