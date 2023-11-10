@@ -7,7 +7,7 @@ permissions:
 
 jobs:
   auto-approve:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, small]
     if: ${{ github.actor == 'renovate[bot]' || github.actor == 'dependabot[bot]' }}
     steps:
       - name: Approve Renovate PR
