@@ -11,6 +11,7 @@ import (
 	"golang.org/x/exp/slog"
 	yamlV3 "gopkg.in/yaml.v3"
 	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
+	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -67,4 +68,16 @@ func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 	}
 
 	return out, nil
+}
+
+func GetDelegatedVirtualService(delegate *networkingv1alpha3.Delegate, virtualServices []*v1alpha3.VirtualService) (*v1alpha3.VirtualService, error) {
+	for _, vs := range virtualServices {
+		if vs.Name == delegate.Name {
+			if delegate.Namespace != "" && vs.Namespace != delegate.Namespace {
+				continue
+			}
+			return vs, nil
+		}
+	}
+	return nil, fmt.Errorf("virtualservice %s not found", delegate.Name)
 }

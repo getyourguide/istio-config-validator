@@ -28,7 +28,21 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 			return summary, details, err
 		}
 		for _, input := range inputs {
-			route, err := GetRoute(input, parsed.VirtualServices)
+			var err error
+			var route *networkingv1alpha3.HTTPRoute
+			var delegated bool
+			if testCase.Delegate != nil {
+				delegated = true
+				vs, err := parser.GetDelegatedVirtualService(testCase.Delegate, parsed.VirtualServices)
+				if err != nil {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
+				}
+				route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, delegated)
+			} else {
+				delegated = false
+				route, err = GetRoute(input, parsed.VirtualServices, delegated)
+			}
 			if err != nil {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 				return summary, details, fmt.Errorf("error getting destinations: %v", err)
@@ -68,10 +82,10 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 }
 
 // GetRoute returns the route that matched a given input.
-func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService) (*networkingv1alpha3.HTTPRoute, error) {
+func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService, delegated bool) (*networkingv1alpha3.HTTPRoute, error) {
 	for _, vs := range virtualServices {
 		spec := &vs.Spec
-		if !contains(spec.Hosts, input.Authority) {
+		if !delegated && !contains(spec.Hosts, input.Authority) {
 			continue
 		}
 
