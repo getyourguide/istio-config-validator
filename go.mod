@@ -5,12 +5,12 @@ go 1.21
 require (
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
-	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3
+	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
 	gopkg.in/yaml.v3 v3.0.1
 	istio.io/api v1.20.2
 	istio.io/client-go v1.20.2
 	istio.io/pkg v0.0.0-20231221211216-7635388a563e
-	k8s.io/apimachinery v0.29.0
+	k8s.io/apimachinery v0.29.1
 )
 
 require (
@@ -39,7 +39,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/oauth2 v0.10.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
