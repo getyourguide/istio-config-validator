@@ -1,0 +1,21 @@
+TestCases:
+  - description: if scheme matches https send to https endpoint
+    wantMatch: true
+    request:
+      scheme: https
+      authority: ["scheme.com"]
+      method: ["GET"]
+      uri: ["/scheme/v1"]
+    route:
+      - destination:
+          host: has-https
+  - description: if scheme does not match https send to http endpoint
+    wantMatch: true
+    request:
+      scheme: ftp
+      authority: ["scheme.com"]
+      method: ["GET"]
+      uri: ["/scheme/v1"]
+    route:
+      - destination:
+          host: http

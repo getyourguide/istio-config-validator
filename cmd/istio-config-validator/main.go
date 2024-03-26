@@ -61,15 +61,18 @@ func main() {
 func getFiles(names []string) []string {
 	var files []string
 	for _, name := range names {
-		filepath.Walk(name, func(path string, info os.FileInfo, err error) error {
+		err := filepath.Walk(name, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
-				log.Fatal(err.Error())
+				return err
 			}
 			if !info.IsDir() && isYaml(info) {
 				files = append(files, path)
 			}
 			return nil
 		})
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 	}
 	return files
 }

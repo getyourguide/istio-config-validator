@@ -1,11 +1,11 @@
 // Package parser is the package responsible for parsing test cases and istio configuration
-// to be use on test assertionpackage parser
+// to be used on test assertionpackage parser
 package parser
 
 import (
 	"fmt"
 
-	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
+	"istio.io/client-go/pkg/apis/networking/v1alpha3"
 )
 
 // Parser contains the parsed files needed to run tests

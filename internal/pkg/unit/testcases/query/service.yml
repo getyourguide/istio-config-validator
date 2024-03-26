@@ -1,0 +1,42 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: example
+  namespace: example
+spec:
+  gateways:
+    - mesh
+  hosts:
+    - www.example.com
+    - example.com
+  http:
+    - match:
+        # full match, all query params should be present
+        - uri:
+            prefix: /queries
+          queryParams:
+            version:
+              exact:
+            exactMatch:
+              exact:
+                name-matches
+            prefixMatch:
+              prefix:
+                prefixed-
+      route:
+        - destination:
+            host: full.query.svc.cluster.local
+    - match:
+        # partial match: version should be present
+        - uri:
+            prefix: /queries
+          queryParams:
+            version:
+              exact:
+      route:
+        - destination:
+            host: partial.query.svc.cluster.local
+    - match:
+      route:
+        - destination:
+            host: default.query.svc.cluster.local
