@@ -33,6 +33,30 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 				return summary, details, fmt.Errorf("error getting destinations: %v", err)
 			}
+			if route.Delegate != nil {
+				// If delegate is defined in the test case, assume the delegated virtual service is not in the parsed VirtualServices list.
+				// Compare the delegate configuration and skip the rest of the checks.
+				if testCase.Delegate != nil {
+					if reflect.DeepEqual(route.Delegate, testCase.Delegate) != testCase.WantMatch {
+						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+						return summary, details, fmt.Errorf("delegate missmatch=%v, want %v, rule matched: %v", route.Delegate, testCase.Delegate, route.Match)
+					}
+					details = append(details, fmt.Sprintf("PASS input:[%v]", input))
+					continue
+				} else {
+					// Else, lookup delegated virtual service and run the rest of the checks as usual.
+					vs, err := GetDelegatedVirtualService(route.Delegate, parsed.VirtualServices)
+					if err != nil {
+						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+						return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
+					}
+					route, err = GetRoute(input, []*v1alpha3.VirtualService{vs})
+					if err != nil {
+						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+						return summary, details, fmt.Errorf("error getting destinations: %v", err)
+					}
+				}
+			}
 			if reflect.DeepEqual(route.Route, testCase.Route) != testCase.WantMatch {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 				return summary, details, fmt.Errorf("destination missmatch=%v, want %v, rule matched: %v", route.Route, testCase.Route, route.Match)
@@ -71,7 +95,8 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService) (*networkingv1alpha3.HTTPRoute, error) {
 	for _, vs := range virtualServices {
 		spec := &vs.Spec
-		if !contains(spec.Hosts, input.Authority) {
+		// Delegated VirtualServices can't define hosts, so skip the check if hosts is nil.
+		if spec.Hosts != nil && !contains(spec.Hosts, input.Authority) {
 			continue
 		}
 
@@ -99,4 +124,16 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+func GetDelegatedVirtualService(delegate *networkingv1alpha3.Delegate, virtualServices []*v1alpha3.VirtualService) (*v1alpha3.VirtualService, error) {
+	for _, vs := range virtualServices {
+		if vs.Name == delegate.Name {
+			if delegate.Namespace != "" && vs.Namespace != delegate.Namespace {
+				continue
+			}
+			return vs, nil
+		}
+	}
+	return nil, fmt.Errorf("virtualservice %s not found", delegate.Name)
 }

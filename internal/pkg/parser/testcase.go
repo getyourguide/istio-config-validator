@@ -38,6 +38,7 @@ type TestCase struct {
 	Rewrite     *networkingv1alpha3.HTTPRewrite            `yaml:"rewrite"`
 	Fault       *networkingv1alpha3.HTTPFaultInjection     `yaml:"fault"`
 	Headers     *networkingv1alpha3.Headers                `yaml:"headers"`
+	Delegate    *networkingv1alpha3.Delegate               `yaml:"delegate"`
 	WantMatch   bool                                       `yaml:"wantMatch"`
 }
 
