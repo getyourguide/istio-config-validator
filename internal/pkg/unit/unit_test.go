@@ -34,6 +34,7 @@ func TestGetRoute(t *testing.T) {
 	type args struct {
 		input           parser.Input
 		virtualServices []*v1alpha3.VirtualService
+		checkHosts      bool
 	}
 	tests := []struct {
 		name    string
@@ -59,6 +60,7 @@ func TestGetRoute(t *testing.T) {
 						}},
 					},
 				}},
+				checkHosts: true,
 			},
 			want:    &networkingv1alpha3.HTTPRoute{},
 			wantErr: false,
@@ -87,6 +89,7 @@ func TestGetRoute(t *testing.T) {
 						}},
 					},
 				}},
+				checkHosts: true,
 			},
 			want: &networkingv1alpha3.HTTPRoute{
 				Route: []*networkingv1alpha3.HTTPRouteDestination{{
@@ -138,6 +141,7 @@ func TestGetRoute(t *testing.T) {
 						}},
 					},
 				}},
+				checkHosts: true,
 			},
 			want: &networkingv1alpha3.HTTPRoute{
 				Route: []*networkingv1alpha3.HTTPRouteDestination{{
@@ -177,6 +181,7 @@ func TestGetRoute(t *testing.T) {
 						}},
 					},
 				}},
+				checkHosts: true,
 			},
 			want: &networkingv1alpha3.HTTPRoute{
 				Route: []*networkingv1alpha3.HTTPRouteDestination{{
@@ -216,6 +221,7 @@ func TestGetRoute(t *testing.T) {
 						}},
 					},
 				}},
+				checkHosts: false,
 			},
 			want: &networkingv1alpha3.HTTPRoute{
 				Route: []*networkingv1alpha3.HTTPRouteDestination{{
@@ -235,7 +241,7 @@ func TestGetRoute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetRoute(tt.args.input, tt.args.virtualServices)
+			got, err := GetRoute(tt.args.input, tt.args.virtualServices, tt.args.checkHosts)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetRoute() error = %v, wantErr %v", err, tt.wantErr)
 				return

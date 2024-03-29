@@ -6,6 +6,7 @@ package unit
 import (
 	"fmt"
 	"reflect"
+	"slices"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
@@ -28,7 +29,7 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 			return summary, details, err
 		}
 		for _, input := range inputs {
-			route, err := GetRoute(input, parsed.VirtualServices)
+			route, err := GetRoute(input, parsed.VirtualServices, true)
 			if err != nil {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 				return summary, details, fmt.Errorf("error getting destinations: %v", err)
@@ -50,7 +51,7 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 						return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
 					}
-					route, err = GetRoute(input, []*v1alpha3.VirtualService{vs})
+					route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, false)
 					if err != nil {
 						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 						return summary, details, fmt.Errorf("error getting destinations: %v", err)
@@ -92,11 +93,10 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 }
 
 // GetRoute returns the route that matched a given input.
-func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService) (*networkingv1alpha3.HTTPRoute, error) {
+func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService, checkHosts bool) (*networkingv1alpha3.HTTPRoute, error) {
 	for _, vs := range virtualServices {
 		spec := &vs.Spec
-		// Delegated VirtualServices can't define hosts, so skip the check if hosts is nil.
-		if spec.Hosts != nil && !contains(spec.Hosts, input.Authority) {
+		if checkHosts && !slices.Contains(spec.Hosts, input.Authority) {
 			continue
 		}
 
@@ -115,15 +115,6 @@ func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService) (*
 	}
 
 	return &networkingv1alpha3.HTTPRoute{}, nil
-}
-
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
 }
 
 func GetDelegatedVirtualService(delegate *networkingv1alpha3.Delegate, virtualServices []*v1alpha3.VirtualService) (*v1alpha3.VirtualService, error) {
