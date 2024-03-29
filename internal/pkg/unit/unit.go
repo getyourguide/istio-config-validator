@@ -44,18 +44,18 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 					}
 					details = append(details, fmt.Sprintf("PASS input:[%v]", input))
 					continue
-				} else {
-					// Else, lookup delegated virtual service and run the rest of the checks as usual.
-					vs, err := GetDelegatedVirtualService(route.Delegate, parsed.VirtualServices)
-					if err != nil {
-						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-						return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
-					}
-					route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, false)
-					if err != nil {
-						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-						return summary, details, fmt.Errorf("error getting destinations: %v", err)
-					}
+				}
+
+				// Lookup delegated virtual service and run the rest of the checks as usual.
+				vs, err := GetDelegatedVirtualService(route.Delegate, parsed.VirtualServices)
+				if err != nil {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
+				}
+				route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, false)
+				if err != nil {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("error getting destinations: %v", err)
 				}
 			}
 			if reflect.DeepEqual(route.Route, testCase.Route) != testCase.WantMatch {
