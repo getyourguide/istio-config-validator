@@ -29,7 +29,8 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 			return summary, details, err
 		}
 		for _, input := range inputs {
-			route, err := GetRoute(input, parsed.VirtualServices, true)
+			checkHosts := true
+			route, err := GetRoute(input, parsed.VirtualServices, checkHosts)
 			if err != nil {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 				return summary, details, fmt.Errorf("error getting destinations: %v", err)
@@ -52,7 +53,8 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 					return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
 				}
-				route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, false)
+				checkHosts = false
+				route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, checkHosts)
 				if err != nil {
 					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 					return summary, details, fmt.Errorf("error getting destinations: %v", err)
