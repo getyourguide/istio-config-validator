@@ -23,3 +23,5 @@
 [._]sw[a-p]
 
 vendor/
+
+istio-config-validator

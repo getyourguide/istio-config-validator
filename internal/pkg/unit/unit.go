@@ -6,6 +6,7 @@ package unit
 import (
 	"fmt"
 	"reflect"
+	"slices"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
@@ -28,14 +29,39 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 			return summary, details, err
 		}
 		for _, input := range inputs {
-			route, err := GetRoute(input, parsed.VirtualServices)
+			checkHosts := true
+			route, err := GetRoute(input, parsed.VirtualServices, checkHosts)
 			if err != nil {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 				return summary, details, fmt.Errorf("error getting destinations: %v", err)
 			}
-			if reflect.DeepEqual(route.Route, testCase.Route) != testCase.WantMatch {
-				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-				return summary, details, fmt.Errorf("destination missmatch=%v, want %v, rule matched: %v", route.Route, testCase.Route, route.Match)
+			if route.Delegate != nil {
+				if testCase.Delegate != nil {
+					if reflect.DeepEqual(route.Delegate, testCase.Delegate) != testCase.WantMatch {
+						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+						return summary, details, fmt.Errorf("delegate missmatch=%v, want %v, rule matched: %v", route.Delegate, testCase.Delegate, route.Match)
+					}
+					details = append(details, fmt.Sprintf("PASS input:[%v]", input))
+				}
+				if testCase.Route != nil {
+					vs, err := GetDelegatedVirtualService(route.Delegate, parsed.VirtualServices)
+					if err != nil {
+						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+						return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
+					}
+					checkHosts = false
+					route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, checkHosts)
+					if err != nil {
+						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+						return summary, details, fmt.Errorf("error getting destinations for delegate %v: %v", route.Delegate, err)
+					}
+				}
+			}
+			if testCase.Route != nil {
+				if reflect.DeepEqual(route.Route, testCase.Route) != testCase.WantMatch {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("destination missmatch=%v, want %v, rule matched: %v", route.Route, testCase.Route, route.Match)
+				}
 			}
 			if testCase.Rewrite != nil {
 				if reflect.DeepEqual(route.Rewrite, testCase.Rewrite) != testCase.WantMatch {
@@ -68,10 +94,10 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 }
 
 // GetRoute returns the route that matched a given input.
-func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService) (*networkingv1alpha3.HTTPRoute, error) {
+func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService, checkHosts bool) (*networkingv1alpha3.HTTPRoute, error) {
 	for _, vs := range virtualServices {
 		spec := &vs.Spec
-		if !contains(spec.Hosts, input.Authority) {
+		if checkHosts && !slices.Contains(spec.Hosts, input.Authority) {
 			continue
 		}
 
@@ -92,11 +118,14 @@ func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService) (*
 	return &networkingv1alpha3.HTTPRoute{}, nil
 }
 
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
+func GetDelegatedVirtualService(delegate *networkingv1alpha3.Delegate, virtualServices []*v1alpha3.VirtualService) (*v1alpha3.VirtualService, error) {
+	for _, vs := range virtualServices {
+		if vs.Name == delegate.Name {
+			if delegate.Namespace != "" && vs.Namespace != delegate.Namespace {
+				continue
+			}
+			return vs, nil
 		}
 	}
-	return false
+	return nil, fmt.Errorf("virtualservice %s not found", delegate.Name)
 }

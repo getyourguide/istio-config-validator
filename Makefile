@@ -8,3 +8,12 @@ run:
 				-w ${WORKDIR} \
 				golang:1.21 \
 				go run cmd/istio-config-validator/main.go -t examples/ examples/
+
+build:
+	go build -o istio-config-validator cmd/istio-config-validator/main.go
+
+install:
+	go install cmd/istio-config-validator/main.go
+
+test:
+	go test -race -count=1 ./...

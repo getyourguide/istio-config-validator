@@ -1,0 +1,74 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: merchants
+  namespace: example
+spec:
+  gateways:
+    - mesh
+  hosts:
+    - www.example.org
+    - example.org
+  http:
+    - match:
+        - uri:
+            regex: /merchants(/.*)?
+      delegate:
+        name: merchants-delegate
+    - match:
+        - uri:
+            regex: /seller(/.*)?
+      delegate:
+        name: seller-delegate
+    - match:
+        - uri:
+            regex: /product(/.*)?
+      delegate:
+        name: product-delegate
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: merchants-delegate
+  namespace: example
+spec:
+  gateways:
+    - mesh
+  http:
+    - match:
+        - uri:
+            regex: /merchants(/.*)?
+      route:
+        - destination:
+            host: merchants.merchants.svc.cluster.local
+            port:
+              number: 80
+      headers:
+        request:
+          set:
+            x-custom-header: ok
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: product-delegate
+  namespace: example
+spec:
+  gateways:
+    - mesh
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: product.product.svc.cluster.local
+            port:
+              number: 80
+      rewrite:
+        uri: "/product"
+      headers:
+        request:
+          set:
+            x-custom-header: ok
