@@ -36,33 +36,32 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 				return summary, details, fmt.Errorf("error getting destinations: %v", err)
 			}
 			if route.Delegate != nil {
-				// If delegate is defined in the test case, assume the delegated virtual service is not in the parsed VirtualServices list.
-				// Compare the delegate configuration and skip the rest of the checks.
 				if testCase.Delegate != nil {
 					if reflect.DeepEqual(route.Delegate, testCase.Delegate) != testCase.WantMatch {
 						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 						return summary, details, fmt.Errorf("delegate missmatch=%v, want %v, rule matched: %v", route.Delegate, testCase.Delegate, route.Match)
 					}
 					details = append(details, fmt.Sprintf("PASS input:[%v]", input))
-					continue
 				}
-
-				// Lookup delegated virtual service and run the rest of the checks as usual.
-				vs, err := GetDelegatedVirtualService(route.Delegate, parsed.VirtualServices)
-				if err != nil {
-					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-					return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
-				}
-				checkHosts = false
-				route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, checkHosts)
-				if err != nil {
-					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-					return summary, details, fmt.Errorf("error getting destinations: %v", err)
+				if testCase.Route != nil {
+					vs, err := GetDelegatedVirtualService(route.Delegate, parsed.VirtualServices)
+					if err != nil {
+						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+						return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
+					}
+					checkHosts = false
+					route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, checkHosts)
+					if err != nil {
+						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+						return summary, details, fmt.Errorf("error getting destinations for delegate %v: %v", route.Delegate, err)
+					}
 				}
 			}
-			if reflect.DeepEqual(route.Route, testCase.Route) != testCase.WantMatch {
-				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-				return summary, details, fmt.Errorf("destination missmatch=%v, want %v, rule matched: %v", route.Route, testCase.Route, route.Match)
+			if testCase.Route != nil {
+				if reflect.DeepEqual(route.Route, testCase.Route) != testCase.WantMatch {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("destination missmatch=%v, want %v, rule matched: %v", route.Route, testCase.Route, route.Match)
+				}
 			}
 			if testCase.Rewrite != nil {
 				if reflect.DeepEqual(route.Rewrite, testCase.Rewrite) != testCase.WantMatch {

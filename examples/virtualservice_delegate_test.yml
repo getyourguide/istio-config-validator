@@ -3,14 +3,14 @@ testCases:
   - description: Delegate to merchants
     wantMatch: true
     request:
-      authority: ["example.org"]
-      method: ["GET", "POST"]
-      uri: ["/merchants", "/merchants/v2/"]
+      authority: ['example.org']
+      method: ['GET', 'POST']
+      uri: ['/merchants', '/merchants/v2/']
     route:
-    - destination:
-        host: merchants.merchants.svc.cluster.local
-        port:
-          number: 80
+      - destination:
+          host: merchants.merchants.svc.cluster.local
+          port:
+            number: 80
     headers:
       request:
         set:
@@ -18,8 +18,25 @@ testCases:
   - description: Delegate to seller
     wantMatch: true
     request:
-      authority: ["example.org"]
-      method: ["GET", "POST"]
-      uri: ["/seller", "/seller/1234-abcd-5678-efgh"]
+      authority: ['example.org']
+      method: ['GET', 'POST']
+      uri: ['/seller', '/seller/1234-abcd-5678-efgh']
     delegate:
       name: seller-delegate
+  - description: Delegate to product
+    wantMatch: true
+    request:
+      authority: ['example.org']
+      method: ['GET', 'POST']
+      uri: ['/product', '/product/v2/', '/product/v2/1234-abcd-5678-efgh']
+    route:
+      - destination:
+          host: product.product.svc.cluster.local
+          port:
+            number: 80
+    headers:
+      request:
+        set:
+          x-custom-header: ok
+    delegate:
+      name: product-delegate
