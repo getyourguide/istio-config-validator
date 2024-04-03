@@ -118,6 +118,7 @@ func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService, ch
 	return &networkingv1alpha3.HTTPRoute{}, nil
 }
 
+// GetDelegatedVirtualService returns the virtualservice matching namespace/name matching the delegate argument.
 func GetDelegatedVirtualService(delegate *networkingv1alpha3.Delegate, virtualServices []*v1alpha3.VirtualService) (*v1alpha3.VirtualService, error) {
 	for _, vs := range virtualServices {
 		if vs.Name == delegate.Name {
