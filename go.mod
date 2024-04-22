@@ -5,12 +5,12 @@ go 1.21
 require (
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/exp v0.0.0-20240409090435-93d18d7e34b8
+	golang.org/x/exp fe59bbe5cc7f
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v1.21.1
-	istio.io/client-go v1.21.1
+	istio.io/api v1.21.2
+	istio.io/client-go v1.21.2
 	istio.io/pkg v0.0.0-20231221211216-7635388a563e
-	k8s.io/apimachinery v0.29.3
+	k8s.io/apimachinery v0.30.0
 )
 
 require (
