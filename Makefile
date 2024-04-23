@@ -6,7 +6,7 @@ run:
 	docker run -it --rm --name istio_config_validator \
 				-v ${CURRENTPATH}:${WORKDIR} \
 				-w ${WORKDIR} \
-				golang:1.21 \
+				golang:1.22 \
 				go run cmd/istio-config-validator/main.go -t examples/ examples/
 
 build:

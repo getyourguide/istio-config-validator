@@ -1,16 +1,16 @@
 module github.com/getyourguide/istio-config-validator
 
-go 1.21
+go 1.22.0
 
 require (
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/exp v0.0.0-20240409090435-93d18d7e34b8
+	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v1.21.1
-	istio.io/client-go v1.21.1
+	istio.io/api v1.21.2
+	istio.io/client-go v1.21.2
 	istio.io/pkg v0.0.0-20231221211216-7635388a563e
-	k8s.io/apimachinery v0.29.3
+	k8s.io/apimachinery v0.30.0
 )
 
 require (
@@ -20,7 +20,7 @@ require (
 	cloud.google.com/go/logging v1.9.0 // indirect
 	cloud.google.com/go/longrunning v0.5.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-logr/logr v1.3.0 // indirect
+	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -53,7 +53,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/klog/v2 v2.110.1 // indirect
+	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
