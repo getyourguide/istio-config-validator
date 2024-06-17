@@ -5,12 +5,12 @@ go 1.22.0
 require (
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/exp v0.0.0-20240604190554-fc45aab8b7f8
+	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	gopkg.in/yaml.v3 v3.0.1
 	istio.io/api v1.22.1
 	istio.io/client-go v1.22.1
 	istio.io/pkg v0.0.0-20231221211216-7635388a563e
-	k8s.io/apimachinery v0.30.1
+	k8s.io/apimachinery v0.30.2
 )
 
 require (
