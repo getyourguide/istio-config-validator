@@ -69,6 +69,7 @@ func NewCmdRoot() (*cobra.Command, error) {
 
 	return cmd, nil
 }
+
 func (c *RootCommand) Run(cmd *cobra.Command, _ []string) error {
 	log := logr.FromContextOrDiscard(cmd.Context())
 	tempDir, err := os.MkdirTemp("", ".router-check-tool-")

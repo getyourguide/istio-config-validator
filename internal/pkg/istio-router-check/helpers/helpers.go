@@ -35,7 +35,6 @@ func ReadCRDs(baseDir string) ([]config.Config, error) {
 		configs = append(configs, c...)
 		return nil
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("error reading directory %s: %w", baseDir, err)
 	}
