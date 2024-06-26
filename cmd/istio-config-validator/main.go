@@ -3,11 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"istio.io/pkg/log"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/unit"
 )

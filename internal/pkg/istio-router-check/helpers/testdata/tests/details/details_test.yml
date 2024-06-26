@@ -1,0 +1,17 @@
+tests:
+- test_name: test details.prod.svc.cluster.local/api/v2/products
+  input:
+    authority: details.prod.svc.cluster.local
+    path: /api/v2/products
+    method: GET
+  validate:
+    cluster_name: outbound|80|v2|details.prod.svc.cluster.local
+    path_rewrite: /api/newdetails
+- test_name: test details.prod.svc.cluster.local/api/v2/items
+  input:
+    authority: details.prod.svc.cluster.local
+    path: /api/v2/items
+    method: GET
+  validate:
+    cluster_name: outbound|80|v2|details.prod.svc.cluster.local
+    path_rewrite: /api/newdetails

@@ -1,0 +1,39 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: product-details-route
+spec:
+  hosts:
+  - details.prod.svc.cluster.local
+  http:
+  - name: "details-v2-routes"
+    match:
+    - uri:
+        prefix: "/api/v2/products"
+    - uri:
+        prefix: "/api/v2/items"
+    rewrite:
+      uri: "/api/newdetails"
+    route:
+    - destination:
+        host: details.prod.svc.cluster.local
+        subset: v2
+  - name: "details-v1-route"
+    delegate:
+      name: details-fallback
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: details-fallback
+spec:
+  http:
+    - route:
+        - destination:
+            host: details.prod.svc.cluster.local
+            subset: v1
+      retries:
+        attempts: 3
+        perTryTimeout: 25s
+        retryOn: retriable-status-codes,connect-failure,refused-stream
+      timeout: 25s
