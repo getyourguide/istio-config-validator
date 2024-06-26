@@ -14,6 +14,10 @@ func TestRootCommand(t *testing.T) {
 	require.NotNil(t, cmdRoot)
 
 	t.Run("it should fail with missing required flags", func(t *testing.T) {
+		// TODO(cainelli): add router_check_tool to CI
+		if os.Getenv("CI") == "true" {
+			t.Skip("skip as it requires router_check_tool binary not yet in CI")
+		}
 		err = cmdRoot.Execute()
 		require.ErrorContains(t, err, "required flag(s)")
 		require.ErrorContains(t, err, "config-dir")
@@ -21,6 +25,7 @@ func TestRootCommand(t *testing.T) {
 	})
 
 	t.Run("it should run the test", func(t *testing.T) {
+		// TODO(cainelli): add router_check_tool to CI
 		if os.Getenv("CI") == "true" {
 			t.Skip("skip as it requires router_check_tool binary not yet in CI")
 		}

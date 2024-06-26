@@ -15,14 +15,14 @@ func TestReadCRDs(t *testing.T) {
 		assert func(t *testing.T, got []config.Config)
 	}{{
 		name: "it should return single virtualservice",
-		path: "testdata/config-files/reviews",
+		path: "testdata/bookinfo/reviews",
 		assert: func(t *testing.T, got []config.Config) {
 			require.Len(t, got, 1)
 			require.Equal(t, "reviews-route", got[0].GetName())
 		},
 	}, {
 		name: "it should return multiple virtualservices across directories",
-		path: "testdata/config-files",
+		path: "testdata/bookinfo",
 		assert: func(t *testing.T, got []config.Config) {
 			require.Len(t, got, 3)
 			wantVS := []string{"reviews-route", "product-details-route", "details-fallback"}
@@ -41,16 +41,34 @@ func TestReadCRDs(t *testing.T) {
 
 func TestReadEnvoyTests(t *testing.T) {
 	for _, tt := range []struct {
-		name   string
-		path   string
-		assert func(t *testing.T, got helpers.EnvoyTests)
+		name string
+		path string
+		want []string
 	}{{
-		name: "it should return single test",
+		name: "it should return single folder test",
+		path: "testdata/tests/reviews",
+		want: []string{
+			"test reviews.prod.svc.cluster.local/wpcatalog",
+			"test reviews.prod.svc.cluster.local/consumercatalog",
+		},
+	}, {
+		name: "it should return tests from multiple folders",
+		path: "testdata/tests/",
+		want: []string{
+			"test details.prod.svc.cluster.local/api/v2/products",
+			"test details.prod.svc.cluster.local/api/v2/items",
+			"test reviews.prod.svc.cluster.local/wpcatalog",
+			"test reviews.prod.svc.cluster.local/consumercatalog",
+		},
 	}} {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := helpers.ReadTests(tt.path)
+			parsed, err := helpers.ReadTests(tt.path)
 			require.NoError(t, err)
-			tt.assert(t, got)
+			var gotTests []string
+			for _, t := range parsed.Tests {
+				gotTests = append(gotTests, t.TestName)
+			}
+			require.ElementsMatch(t, tt.want, gotTests)
 		})
 	}
 }
