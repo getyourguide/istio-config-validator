@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: details
+spec:
+  hosts:
+  - details.prod.svc.cluster.local
+  http:
+  - name: "details-v2-routes"
+    match:
+    - uri:
+        prefix: "/api/v2/products"
+    - uri:
+        prefix: "/api/v2/items"
+    rewrite:
+      uri: "/api/newdetails"
+    route:
+    - destination:
+        host: details.prod.svc.cluster.local
+        subset: v2

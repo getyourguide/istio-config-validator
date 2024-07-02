@@ -1,0 +1,17 @@
+tests:
+- test_name: test reviews.prod.svc.cluster.local/wpcatalog
+  input:
+    authority: reviews.prod.svc.cluster.local
+    path: /wpcatalog
+    method: GET
+  validate:
+    cluster_name: outbound|80|v2|reviews.prod.svc.cluster.local
+    path_rewrite: /newcatalog
+- test_name: test reviews.prod.svc.cluster.local/consumercatalog
+  input:
+    authority: reviews.prod.svc.cluster.local
+    path: /consumercatalog
+    method: GET
+  validate:
+    cluster_name: outbound|80|v2|reviews.prod.svc.cluster.local
+    path_rewrite: /newcatalog
