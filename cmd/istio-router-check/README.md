@@ -34,7 +34,7 @@ Schema: All internal schemas in the tool are based on proto3.
 
 ### -c \<string>, –config-path \<string>
 
-Path to a router config file (YAML or JSON). The router config file schema is found in config and the config file extension must reflect its file type (for instance, .json for JSON and .yaml for YAML).
+Path to a VirtualServices config files. The tool will read and transform Istio configuration into Envoy configuration in order to use Envoy [Route Table Check Tool](https://www.envoyproxy.io/docs/envoy/latest/operations/tools/route_table_check_tool#install-tools-route-table-check-tool)
 
 ### -o \<string>, –output-path \<string>
 
