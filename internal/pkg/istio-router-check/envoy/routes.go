@@ -18,6 +18,9 @@ type RouteGenerator struct {
 	routes  []*route.RouteConfiguration
 }
 
+// Routes returns a list of routes in Envoy format. It uses istio's fake discovery server to generate the routes.
+// The routes are generated from the Configs loaded in the RouteGenerator.
+// TODO(cainelli): The RouterGenerator only takes VirtualServices into account when they are bound to `mesh`, VirtualServices bound exclusively to `gateway` are not considered.
 func (rg *RouteGenerator) Routes() ([]*route.RouteConfiguration, error) {
 	logOpts := istiolog.DefaultOptions()
 	logOpts.SetDefaultOutputLevel("all", istiolog.ErrorLevel)

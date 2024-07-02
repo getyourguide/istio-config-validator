@@ -19,16 +19,20 @@ import (
 const envoyRouterCheckTool string = "router_check_tool"
 
 type RootCommand struct {
+	Verbosity        int
+	RouterCheckFlags RouterCheckFlags
+}
+
+type RouterCheckFlags struct {
 	ConfigDir               string
 	TestDir                 string
 	Details                 bool
 	DisableDeprecationCheck bool
 	OnlyShowFailures        bool
-	FailThreshold           float64
+	FailUnder               float64
 	CoverageAll             bool
 	OutputDir               string
 	DetailedCoverage        bool
-	Verbosity               int
 }
 
 func NewCmdRoot() (*cobra.Command, error) {
@@ -46,18 +50,20 @@ func NewCmdRoot() (*cobra.Command, error) {
 			cmd.SetContext(ctx)
 			return nil
 		},
-		RunE:         rootCmd.Run,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return rootCmd.Run(cmd.Context())
+		},
 		SilenceUsage: true,
 	}
-	cmd.Flags().StringVarP(&rootCmd.ConfigDir, "config-dir", "c", "", "directory containing virtualservices")
-	cmd.Flags().StringVarP(&rootCmd.TestDir, "test-dir", "t", "", "directory containing tests")
-	cmd.Flags().BoolVarP(&rootCmd.Details, "details", "d", true, "print detailed information about the test results")
-	cmd.Flags().BoolVarP(&rootCmd.DisableDeprecationCheck, "disable-deprecation-check", "", true, "disable deprecation check")
-	cmd.Flags().BoolVarP(&rootCmd.OnlyShowFailures, "only-show-failures", "", false, "only show failures")
-	cmd.Flags().Float64VarP(&rootCmd.FailThreshold, "fail-threshold", "f", 0.0, "threshold for failure")
-	cmd.Flags().BoolVarP(&rootCmd.CoverageAll, "covall", "", false, "measure coverage by checking all route fields")
-	cmd.Flags().StringVarP(&rootCmd.OutputDir, "output-dir", "o", "", "output directory for coverage information")
-	cmd.Flags().BoolVarP(&rootCmd.DetailedCoverage, "detailed-coverage", "", false, "print detailed coverage information")
+	cmd.Flags().StringVarP(&rootCmd.RouterCheckFlags.ConfigDir, "config-dir", "c", "", "directory containing virtualservices")
+	cmd.Flags().StringVarP(&rootCmd.RouterCheckFlags.TestDir, "test-dir", "t", "", "directory containing tests")
+	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.Details, "details", "d", true, "print detailed information about the test results")
+	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.DisableDeprecationCheck, "disable-deprecation-check", "", true, "disable deprecation check")
+	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.OnlyShowFailures, "only-show-failures", "", false, "only show failures")
+	cmd.Flags().Float64VarP(&rootCmd.RouterCheckFlags.FailUnder, "fail-under", "f", 0.0, "threshold for failure")
+	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.CoverageAll, "covall", "", false, "measure coverage by checking all route fields")
+	cmd.Flags().StringVarP(&rootCmd.RouterCheckFlags.OutputDir, "output-dir", "o", "", "output directory for coverage information")
+	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.DetailedCoverage, "detailed-coverage", "", false, "print detailed coverage information")
 	cmd.Flags().IntVarP(&rootCmd.Verbosity, "", "v", 1, "log verbosity level")
 
 	requiredFlags := []string{"config-dir", "test-dir"}
@@ -70,8 +76,8 @@ func NewCmdRoot() (*cobra.Command, error) {
 	return cmd, nil
 }
 
-func (c *RootCommand) Run(cmd *cobra.Command, _ []string) error {
-	log := logr.FromContextOrDiscard(cmd.Context())
+func (c *RootCommand) Run(ctx context.Context) error {
+	log := logr.FromContextOrDiscard(ctx)
 	tempDir, err := os.MkdirTemp("", ".router-check-tool-")
 	if err != nil {
 		return fmt.Errorf("failed to create temp dir: %w", err)
@@ -80,11 +86,11 @@ func (c *RootCommand) Run(cmd *cobra.Command, _ []string) error {
 	testsFile := filepath.Join(tempDir, "tests.json")
 	routeFile := filepath.Join(tempDir, "routes.json")
 
-	if err := c.prepareTests(cmd.Context(), testsFile); err != nil {
+	if err := c.prepareTests(ctx, testsFile); err != nil {
 		return fmt.Errorf("failed to prepare tests: %w", err)
 	}
 
-	if err := c.prepareRoutes(cmd.Context(), routeFile); err != nil {
+	if err := c.prepareRoutes(ctx, routeFile); err != nil {
 		return fmt.Errorf("failed to prepare routes: %w", err)
 	}
 
@@ -104,8 +110,8 @@ func (c *RootCommand) Run(cmd *cobra.Command, _ []string) error {
 func (c *RootCommand) prepareTests(ctx context.Context, outputFile string) error {
 	log := logr.FromContextOrDiscard(ctx)
 
-	log.V(3).Info("reading tests", "dir", c.TestDir)
-	tests, err := helpers.ReadTests(c.TestDir)
+	log.V(3).Info("reading tests", "dir", c.RouterCheckFlags.TestDir)
+	tests, err := helpers.ReadTests(c.RouterCheckFlags.TestDir)
 	if err != nil {
 		return fmt.Errorf("failed to read test files: %w", err)
 	}
@@ -126,7 +132,7 @@ func (c *RootCommand) prepareRoutes(ctx context.Context, outputFile string) erro
 	log := logr.FromContextOrDiscard(ctx)
 
 	log.V(3).Info("reading virtualservices")
-	cfg, err := helpers.ReadCRDs(c.ConfigDir)
+	cfg, err := helpers.ReadCRDs(c.RouterCheckFlags.ConfigDir)
 	if err != nil {
 		return fmt.Errorf("failed to read config files: %w", err)
 	}
@@ -160,25 +166,25 @@ func (c *RootCommand) routerCheckFlags(configFile, testFile string) []string {
 		"--config-path", configFile,
 		"--test-path", testFile,
 	}
-	if c.Details {
+	if c.RouterCheckFlags.Details {
 		args = append(args, "--details")
 	}
-	if c.DisableDeprecationCheck {
+	if c.RouterCheckFlags.DisableDeprecationCheck {
 		args = append(args, "--disable-deprecation-check")
 	}
-	if c.OnlyShowFailures {
+	if c.RouterCheckFlags.OnlyShowFailures {
 		args = append(args, "--only-show-failures")
 	}
-	if c.FailThreshold != 0.0 {
-		args = append(args, "--fail-under", fmt.Sprintf("%f", c.FailThreshold))
+	if c.RouterCheckFlags.FailUnder != 0.0 {
+		args = append(args, "--fail-under", fmt.Sprintf("%f", c.RouterCheckFlags.FailUnder))
 	}
-	if c.CoverageAll {
+	if c.RouterCheckFlags.CoverageAll {
 		args = append(args, "--covall")
 	}
-	if c.OutputDir != "" {
-		args = append(args, "--output-dir", c.OutputDir)
+	if c.RouterCheckFlags.OutputDir != "" {
+		args = append(args, "--output-dir", c.RouterCheckFlags.OutputDir)
 	}
-	if c.DetailedCoverage {
+	if c.RouterCheckFlags.DetailedCoverage {
 		args = append(args, "--detailed-coverage")
 	}
 

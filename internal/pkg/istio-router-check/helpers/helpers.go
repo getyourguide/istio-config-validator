@@ -15,7 +15,7 @@ func ReadCRDs(baseDir string) ([]config.Config, error) {
 	var configs []config.Config
 	err := filepath.Walk(baseDir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			return fmt.Errorf("error reading directory %s: %w", baseDir, err)
+			return fmt.Errorf("could not read directory %s: %w", baseDir, err)
 		}
 		if info.IsDir() {
 			return nil
@@ -36,7 +36,7 @@ func ReadCRDs(baseDir string) ([]config.Config, error) {
 		return nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error reading directory %s: %w", baseDir, err)
+		return nil, fmt.Errorf("could not read directory %s: %w", baseDir, err)
 	}
 	return configs, nil
 }
@@ -56,7 +56,7 @@ func ReadTests(baseDir string) (EnvoyTests, error) {
 	var tests EnvoyTests
 	err := filepath.Walk(baseDir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			return fmt.Errorf("error reading directory %s: %w", baseDir, err)
+			return fmt.Errorf("could not read directory %s: %w", baseDir, err)
 		}
 		if info.IsDir() {
 			return nil
@@ -66,7 +66,7 @@ func ReadTests(baseDir string) (EnvoyTests, error) {
 		}
 		data, err := os.ReadFile(path)
 		if err != nil {
-			return fmt.Errorf("error reading file %s: %w", path, err)
+			return fmt.Errorf("could not read file %s: %w", path, err)
 		}
 		var t EnvoyTests
 		err = yaml.Unmarshal(data, &t)
@@ -77,7 +77,7 @@ func ReadTests(baseDir string) (EnvoyTests, error) {
 		return nil
 	})
 	if err != nil {
-		return EnvoyTests{}, fmt.Errorf("error reading directory %s: %w", baseDir, err)
+		return EnvoyTests{}, fmt.Errorf("could not read directory %s: %w", baseDir, err)
 	}
 	return tests, nil
 }
