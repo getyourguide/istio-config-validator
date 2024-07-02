@@ -111,7 +111,7 @@ func (c *RootCommand) prepareTests(ctx context.Context, outputFile string) error
 	log := logr.FromContextOrDiscard(ctx)
 
 	log.V(3).Info("reading tests", "dir", c.RouterCheckFlags.TestDir)
-	tests, err := helpers.ReadTests(c.RouterCheckFlags.TestDir)
+	tests, err := helpers.ReadEnvoyTests(c.RouterCheckFlags.TestDir)
 	if err != nil {
 		return fmt.Errorf("failed to read test files: %w", err)
 	}

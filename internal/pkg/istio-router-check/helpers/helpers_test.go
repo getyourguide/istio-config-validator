@@ -62,7 +62,7 @@ func TestReadEnvoyTests(t *testing.T) {
 		},
 	}} {
 		t.Run(tt.name, func(t *testing.T) {
-			parsed, err := helpers.ReadTests(tt.path)
+			parsed, err := helpers.ReadEnvoyTests(tt.path)
 			require.NoError(t, err)
 			var gotTests []string
 			for _, t := range parsed.Tests {
