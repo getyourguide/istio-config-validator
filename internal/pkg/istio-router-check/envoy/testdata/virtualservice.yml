@@ -3,6 +3,8 @@ kind: VirtualService
 metadata:
   name: reviews-route
 spec:
+  gateways:
+  - istio-system/istio-ingressgateway
   hosts:
   - reviews.prod.svc.cluster.local
   http:

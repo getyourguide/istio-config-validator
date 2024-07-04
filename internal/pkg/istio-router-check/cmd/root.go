@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/istio-router-check/envoy"
-	"github.com/getyourguide/istio-config-validator/internal/pkg/istio-router-check/helpers"
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
 	"istio.io/istio/pkg/util/protomarshal"
@@ -19,7 +18,9 @@ import (
 const envoyRouterCheckTool string = "router_check_tool"
 
 type RootCommand struct {
+	Gateway          string
 	Verbosity        int
+	GenerateOnly     bool
 	RouterCheckFlags RouterCheckFlags
 }
 
@@ -36,6 +37,7 @@ type RouterCheckFlags struct {
 }
 
 func NewCmdRoot() (*cobra.Command, error) {
+	ctx := context.Background()
 	rootCmd := &RootCommand{}
 	cmd := &cobra.Command{
 		Use: "istio-router-check",
@@ -46,7 +48,7 @@ func NewCmdRoot() (*cobra.Command, error) {
 			logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 				Level: slog.Level(rootCmd.Verbosity),
 			}))
-			ctx := logr.NewContextWithSlogLogger(cmd.Context(), logger)
+			ctx = logr.NewContextWithSlogLogger(ctx, logger)
 			cmd.SetContext(ctx)
 			return nil
 		},
@@ -55,6 +57,7 @@ func NewCmdRoot() (*cobra.Command, error) {
 		},
 		SilenceUsage: true,
 	}
+	// Router check flags
 	cmd.Flags().StringVarP(&rootCmd.RouterCheckFlags.ConfigDir, "config-dir", "c", "", "directory containing virtualservices")
 	cmd.Flags().StringVarP(&rootCmd.RouterCheckFlags.TestDir, "test-dir", "t", "", "directory containing tests")
 	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.Details, "details", "d", true, "print detailed information about the test results")
@@ -64,7 +67,11 @@ func NewCmdRoot() (*cobra.Command, error) {
 	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.CoverageAll, "covall", "", false, "measure coverage by checking all route fields")
 	cmd.Flags().StringVarP(&rootCmd.RouterCheckFlags.OutputDir, "output-dir", "o", "", "output directory for coverage information")
 	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.DetailedCoverage, "detailed-coverage", "", false, "print detailed coverage information")
+
+	// Root flags
 	cmd.Flags().IntVarP(&rootCmd.Verbosity, "", "v", 1, "log verbosity level")
+	cmd.Flags().StringVarP(&rootCmd.Gateway, "gateway", "", "", "Only consider VirtualServices bound to this gateway")
+	cmd.Flags().BoolVarP(&rootCmd.GenerateOnly, "generate-only", "", false, "Only generate the tests and routes, do not run the router check tool")
 
 	requiredFlags := []string{"config-dir", "test-dir"}
 	for _, flag := range requiredFlags {
@@ -94,6 +101,11 @@ func (c *RootCommand) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to prepare routes: %w", err)
 	}
 
+	if c.GenerateOnly {
+		log.Info("skipping router check tool")
+		return nil
+	}
+
 	args := c.routerCheckFlags(routeFile, testsFile)
 	routerCheck := exec.Command(envoyRouterCheckTool, args...)
 
@@ -111,7 +123,7 @@ func (c *RootCommand) prepareTests(ctx context.Context, outputFile string) error
 	log := logr.FromContextOrDiscard(ctx)
 
 	log.V(3).Info("reading tests", "dir", c.RouterCheckFlags.TestDir)
-	tests, err := helpers.ReadEnvoyTests(c.RouterCheckFlags.TestDir)
+	tests, err := envoy.ReadTests(c.RouterCheckFlags.TestDir)
 	if err != nil {
 		return fmt.Errorf("failed to read test files: %w", err)
 	}
@@ -132,14 +144,15 @@ func (c *RootCommand) prepareRoutes(ctx context.Context, outputFile string) erro
 	log := logr.FromContextOrDiscard(ctx)
 
 	log.V(3).Info("reading virtualservices")
-	cfg, err := helpers.ReadCRDs(c.RouterCheckFlags.ConfigDir)
+	cfg, err := envoy.ReadCRDs(c.RouterCheckFlags.ConfigDir)
 	if err != nil {
 		return fmt.Errorf("failed to read config files: %w", err)
 	}
 
-	routeGen := &envoy.RouteGenerator{
-		Configs: cfg,
-	}
+	routeGen := envoy.NewRouteGenerator(
+		envoy.WithConfigs(cfg),
+		envoy.WithGateway(c.Gateway),
+	)
 	routes, err := routeGen.Routes()
 	if err != nil {
 		return fmt.Errorf("failed to generate routes: %w", err)
