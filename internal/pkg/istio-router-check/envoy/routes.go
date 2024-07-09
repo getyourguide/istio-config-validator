@@ -105,7 +105,6 @@ func (rg *routeGenerator) prepareProxy() error {
 			continue
 		}
 		if cfg.Meta.Name == namespacedName.Name && cfg.Meta.Namespace == namespacedName.Namespace {
-			fmt.Printf("gateway found: %+v\n", cfg)
 			gatewayFound = true
 			var selector map[string]string
 			switch v := cfg.Spec.(type) {
@@ -124,7 +123,6 @@ func (rg *routeGenerator) prepareProxy() error {
 	}
 
 	if !gatewayFound {
-		fmt.Printf("gateway not found creating one with metadata %+v\n", metadata)
 		rg.configs = append(rg.configs, config.Config{
 			Meta: config.Meta{
 				GroupVersionKind: gvk.Gateway,

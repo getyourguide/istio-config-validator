@@ -14,7 +14,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func parseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
+func ParseVirtualServices(files []string) ([]*v1alpha3.VirtualService, error) {
 	out := []*v1alpha3.VirtualService{}
 
 	for _, file := range files {
