@@ -23,10 +23,9 @@ import (
 type RootCommand struct {
 	ConfigDir    string
 	TestDir      string
-	EnvoyTestDir string
+	ConvertTests bool
 	OutputDir    string
 	Gateway      string
-	Override     bool
 	Verbosity    int
 }
 
@@ -54,57 +53,61 @@ func NewCmdRoot() (*cobra.Command, error) {
 		SilenceUsage: true,
 	}
 
-	cmd.Flags().IntVarP(&rootCmd.Verbosity, "", "v", LevelInfo, "log verbosity level")
-	cmd.Flags().StringVarP(&rootCmd.Gateway, "gateway", "", "", "only consider VirtualServices bound to this gateway")
-	cmd.Flags().StringVarP(&rootCmd.ConfigDir, "config-dir", "c", "", "directory containing Istio VirtualService and Gateway configs")
-	cmd.Flags().StringVarP(&rootCmd.TestDir, "test-dir", "t", "", "directory containing old format tests")
-	cmd.Flags().StringVarP(&rootCmd.EnvoyTestDir, "envoy-test-dir", "", "", "directory containing Envoy format tests")
-	cmd.Flags().StringVarP(&rootCmd.OutputDir, "output-dir", "o", "", "directory to output Envoy routes and tests")
-	cmd.Flags().BoolVarP(&rootCmd.Override, "override", "", false, "override existing files in output directory")
+	cmd.Flags().IntVarP(&rootCmd.Verbosity, "", "v", LevelInfo, "Log verbosity level")
+	cmd.Flags().StringVarP(&rootCmd.Gateway, "gateway", "", "", "Only consider VirtualServices bound to this gateway (i.e: istio-system/istio-ingressgateway)")
+	cmd.Flags().StringVarP(&rootCmd.ConfigDir, "config-dir", "c", "", "Directory with Istio VirtualService and Gateway files")
+	cmd.Flags().StringVarP(&rootCmd.TestDir, "test-dir", "t", "", "Directory with Envoy test files")
+	cmd.Flags().BoolVarP(&rootCmd.ConvertTests, "convert-tests", "", false, "Convert istio-config-validator tests into Envoy tests")
+	cmd.Flags().StringVarP(&rootCmd.OutputDir, "output-dir", "o", "", "Directory to output Envoy routes and tests")
 
-	requiredFlags := []string{"output-dir", "config-dir"}
-	for _, flag := range requiredFlags {
+	for _, flag := range []string{"output-dir", "config-dir", "test-dir"} {
 		if err := cmd.MarkFlagRequired(flag); err != nil {
 			return nil, fmt.Errorf("failed to mark flag %q required: %w", flag, err)
 		}
-	}
-	for _, flag := range []string{"config-dir", "test-dir", "envoy-test-dir"} {
 		if err := cmd.MarkFlagDirname(flag); err != nil {
 			return nil, fmt.Errorf("failed to mark flag %q as dirname: %w", flag, err)
 		}
 	}
-	cmd.MarkFlagsMutuallyExclusive("test-dir", "envoy-test-dir")
-	cmd.MarkFlagsOneRequired("test-dir", "envoy-test-dir")
+
+	if err := cmd.Flags().MarkHidden("convert-tests"); err != nil {
+		return nil, fmt.Errorf("failed to mark flag hidden: %w", err)
+	}
 
 	return cmd, nil
 }
 
 func (c *RootCommand) Run(ctx context.Context) error {
-	log := logr.FromContextOrDiscard(ctx)
-	if err := os.MkdirAll(c.OutputDir, os.ModePerm); err != nil {
-		log.V(3).Info("failed to create output directory", "dir", c.OutputDir)
+	if err := os.MkdirAll(c.OutputDir, os.ModePerm); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to create output directory: %w", err)
 	}
-	if err := c.prepareTests(ctx); err != nil {
-		return fmt.Errorf("failed to prepare tests: %w", err)
-	}
-	if err := c.prepareEnvoyTests(ctx); err != nil {
-		return fmt.Errorf("failed to prepare tests: %w", err)
-	}
+
 	if err := c.prepareRoutes(ctx); err != nil {
 		return fmt.Errorf("failed to prepare routes: %w", err)
 	}
+
+	if c.ConvertTests {
+		if err := c.prepareTests(ctx); err != nil {
+			return fmt.Errorf("failed to prepare istio-config-validator tests: %w", err)
+		}
+		return nil
+	}
+
+	if err := c.prepareEnvoyTests(ctx); err != nil {
+		return fmt.Errorf("failed to prepare envoy tests: %w", err)
+	}
+
 	return nil
 }
 
 func (c *RootCommand) prepareEnvoyTests(ctx context.Context) error {
 	log := logr.FromContextOrDiscard(ctx)
-	if c.EnvoyTestDir == "" {
+	if c.TestDir == "" {
 		log.V(LevelDebug).Info("no envoy test directory provided")
 		return nil
 	}
 
-	log.Info("reading tests", "dir", c.EnvoyTestDir)
-	tests, err := envoy.ReadTests(c.EnvoyTestDir)
+	log.Info("reading tests", "dir", c.TestDir)
+	tests, err := envoy.ReadTests(c.TestDir)
 	if err != nil {
 		return fmt.Errorf("failed to read envoy test files: %w", err)
 	}
