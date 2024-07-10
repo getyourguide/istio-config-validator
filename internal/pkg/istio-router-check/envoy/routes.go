@@ -6,6 +6,7 @@ import (
 
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	"github.com/getyourguide/istio-config-validator/internal/pkg/istio-router-check/helpers"
+	v1 "istio.io/api/networking/v1"
 	"istio.io/api/networking/v1alpha3"
 	"istio.io/istio/pilot/pkg/config/kube/crd"
 	"istio.io/istio/pilot/pkg/model"
@@ -108,7 +109,7 @@ func (rg *routeGenerator) prepareProxy() error {
 			gatewayFound = true
 			var selector map[string]string
 			switch v := cfg.Spec.(type) {
-			case *v1alpha3.Gateway:
+			case *v1.Gateway:
 				selector = v.Selector
 			default:
 				return fmt.Errorf("could not cast Gateway spec (%T) for %s/%s", v, cfg.Meta.Namespace, cfg.Meta.Name)
@@ -130,11 +131,11 @@ func (rg *routeGenerator) prepareProxy() error {
 				Namespace:        namespacedName.Namespace,
 				Labels:           metadata.Labels,
 			},
-			Spec: &v1alpha3.Gateway{
+			Spec: &v1.Gateway{
 				Selector: metadata.Labels,
-				Servers: []*v1alpha3.Server{{
+				Servers: []*v1.Server{{
 					Hosts: []string{"*"},
-					Port: &v1alpha3.Port{
+					Port: &v1.Port{
 						Number:   80,
 						Protocol: "HTTP",
 					},
@@ -156,12 +157,12 @@ func ReadCRDs(baseDir string) ([]config.Config, error) {
 	var configs []config.Config
 	yamlFiles, err := helpers.WalkYAML(baseDir)
 	if err != nil {
-		return nil, fmt.Errorf("error reading directory %s: %w", baseDir, err)
+		return nil, fmt.Errorf("could not read directory %s: %w", baseDir, err)
 	}
 	for _, path := range yamlFiles {
 		data, err := os.ReadFile(path)
 		if err != nil {
-			return nil, fmt.Errorf("error reading file %s: %w", path, err)
+			return nil, fmt.Errorf("could not read file %s: %w", path, err)
 		}
 		c, _, err := crd.ParseInputs(string(data))
 		if err != nil {

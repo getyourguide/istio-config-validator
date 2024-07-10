@@ -1,9 +1,10 @@
 # Istio Router Check
 
-An _experimental_ wrapper command for Envoy [Route Table Check Tool](https://www.envoyproxy.io/docs/envoy/latest/operations/tools/route_table_check_tool#install-tools-route-table-check-tool).
+An _experimental_ command that generates configs and tests to Envoy [Route Table Check Tool](https://www.envoyproxy.io/docs/envoy/latest/operations/tools/route_table_check_tool#install-tools-route-table-check-tool).
 
-1. It parses Istio configuration into the Envoy [HTTP Route](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#http-route-components-proto) format required by the tool.
-2. It expects `router_check_tool` binary in the PATH. The tool must be built using Istio's filters and still patches needed to work with Istio. It is currently maintained in a fork of istio proxy in [getyourguide/proxy](https://github.com/getyourguide/proxy).
+1. It parses Istio configuration such as VirtualServices and outputs Envoy [HTTP Route](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#http-route-components-proto) format required by router check tool.
+2. It parses mutitple Envoy Tests and consolidate them into a single file to be used by router check tool.
+3. It parses istio-config-validator test format and converts to the router check tool format. Note that this is highly experimental and does not cover all tests.
 
 ## Running
 

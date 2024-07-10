@@ -22,7 +22,7 @@ func WalkFilter(filterFunc func(path string, info os.FileInfo) bool, baseDirs ..
 	for _, baseDir := range baseDirs {
 		err := filepath.Walk(baseDir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
-				return fmt.Errorf("error reading directory %q: %w", baseDir, err)
+				return fmt.Errorf("could not read directory %q: %w", baseDir, err)
 			}
 			if info.IsDir() {
 				return nil
@@ -34,7 +34,7 @@ func WalkFilter(filterFunc func(path string, info os.FileInfo) bool, baseDirs ..
 			return nil
 		})
 		if err != nil {
-			return nil, fmt.Errorf("error reading directory %q: %w", baseDir, err)
+			return nil, fmt.Errorf("could not read directory %q: %w", baseDir, err)
 		}
 	}
 	return files, nil

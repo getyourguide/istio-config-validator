@@ -167,17 +167,17 @@ func (c *RootCommand) prepareTests(ctx context.Context) error {
 
 	oldFiles, err := helpers.WalkYAML(c.TestDir)
 	if err != nil {
-		return fmt.Errorf("error reading directory %s: %w", c.TestDir, err)
+		return fmt.Errorf("could not read directory %s: %w", c.TestDir, err)
 	}
 	testCases, err := parser.ParseTestCases(oldFiles)
 	if err != nil {
 		return fmt.Errorf("parsing testcases failed: %w", err)
 	}
-	newTests := envoy.Tests{}
+	var newTests envoy.Tests
 	for _, tc := range testCases {
 		inputs, err := tc.Request.Unfold()
 		if err != nil {
-			return fmt.Errorf("error unfolding request: %w", err)
+			return fmt.Errorf("could not unfold request: %w", err)
 		}
 		if !tc.WantMatch {
 			log.V(LevelDebug).Info("skipping negative test", "test", tc.Description, "reason", "router_check_tool does not support negative tests")
@@ -188,7 +188,7 @@ func (c *RootCommand) prepareTests(ctx context.Context) error {
 			continue
 		}
 		for _, req := range inputs {
-			reqHeaders := []envoy.Header{}
+			var reqHeaders []envoy.Header
 			for key, value := range req.Headers {
 				reqHeaders = append(reqHeaders, envoy.Header{Key: key, Value: value})
 			}
@@ -201,7 +201,7 @@ func (c *RootCommand) prepareTests(ctx context.Context) error {
 			}
 			validate, err := convertValidate(input, tc)
 			if err != nil {
-				return fmt.Errorf("error converting test %q: %w", tc.Description, err)
+				return fmt.Errorf("could not convert test %q: %w", tc.Description, err)
 			}
 			newTests.Tests = append(newTests.Tests, envoy.Test{
 				TestName: fmt.Sprintf("%s: method=%q authority=%q path=%q headers=%+v", tc.Description, input.Method, input.Authority, input.Path, input.AdditionalRequestHeaders),
