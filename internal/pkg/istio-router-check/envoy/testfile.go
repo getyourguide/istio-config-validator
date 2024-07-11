@@ -1,5 +1,13 @@
 package envoy
 
+import (
+	"fmt"
+	"os"
+
+	"github.com/getyourguide/istio-config-validator/internal/pkg/istio-router-check/helpers"
+	"gopkg.in/yaml.v3"
+)
+
 type Tests struct {
 	Tests []Test `yaml:"tests,omitempty" json:"tests,omitempty"`
 }
@@ -52,4 +60,25 @@ type Input struct {
 type Header struct {
 	Key   string `yaml:"key,omitempty" json:"key,omitempty"`
 	Value string `yaml:"value,omitempty" json:"value,omitempty"`
+}
+
+func ReadTests(baseDir string) (Tests, error) {
+	var tests Tests
+	yamlFiles, err := helpers.WalkYAML(baseDir)
+	if err != nil {
+		return Tests{}, fmt.Errorf("could not read directory %s: %w", baseDir, err)
+	}
+	for _, path := range yamlFiles {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return Tests{}, fmt.Errorf("could not read file %s: %w", path, err)
+		}
+		var t Tests
+		err = yaml.Unmarshal(data, &t)
+		if err != nil {
+			return Tests{}, fmt.Errorf("could not unmarshalling file %s: %w", path, err)
+		}
+		tests.Tests = append(tests.Tests, t.Tests...)
+	}
+	return tests, nil
 }

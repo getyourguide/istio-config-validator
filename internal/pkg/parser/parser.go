@@ -16,12 +16,12 @@ type Parser struct {
 
 // New parses and loads the testcases and istio configuration files
 func New(testfiles, configfiles []string) (*Parser, error) {
-	testCases, err := parseTestCases(testfiles)
+	testCases, err := ParseTestCases(testfiles)
 	if err != nil {
 		return nil, fmt.Errorf("parsing testcases failed: %w", err)
 	}
 
-	virtualServices, err := parseVirtualServices(configfiles)
+	virtualServices, err := ParseVirtualServices(configfiles)
 	if err != nil {
 		return nil, fmt.Errorf("parsing virtualservices failed: %w", err)
 	}

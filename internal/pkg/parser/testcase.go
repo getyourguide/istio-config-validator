@@ -107,7 +107,7 @@ func (r *Request) Unfold() ([]Input, error) {
 	return out, nil
 }
 
-func parseTestCases(files []string) ([]*TestCase, error) {
+func ParseTestCases(files []string) ([]*TestCase, error) {
 	out := []*TestCase{}
 
 	for _, file := range files {

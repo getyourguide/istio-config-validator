@@ -25,3 +25,4 @@
 vendor/
 
 istio-config-validator
+build/

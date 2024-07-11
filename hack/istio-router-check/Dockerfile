@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o bin/istio-router-check cmd/istio-router-check/main.go
+RUN go build -o bin/istio-router-check hack/istio-router-check/main.go
 
 FROM getyourguide/router-check-tool:release-1.22
 

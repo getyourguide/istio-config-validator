@@ -1,52 +1,49 @@
 package cmd
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/istio-router-check/envoy"
 	"github.com/getyourguide/istio-config-validator/internal/pkg/istio-router-check/helpers"
+	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
+	"istio.io/api/networking/v1alpha3"
 	"istio.io/istio/pkg/util/protomarshal"
 )
 
-const envoyRouterCheckTool string = "router_check_tool"
-
 type RootCommand struct {
-	Verbosity        int
-	RouterCheckFlags RouterCheckFlags
+	ConfigDir    string
+	TestDir      string
+	ConvertTests bool
+	OutputDir    string
+	Gateway      string
+	Verbosity    int
 }
 
-type RouterCheckFlags struct {
-	ConfigDir               string
-	TestDir                 string
-	Details                 bool
-	DisableDeprecationCheck bool
-	OnlyShowFailures        bool
-	FailUnder               float64
-	CoverageAll             bool
-	OutputDir               string
-	DetailedCoverage        bool
-}
+const (
+	LevelInfo  = 0
+	LevelDebug = 9
+)
 
 func NewCmdRoot() (*cobra.Command, error) {
+	ctx := context.Background()
 	rootCmd := &RootCommand{}
 	cmd := &cobra.Command{
 		Use: "istio-router-check",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if _, err := exec.LookPath(envoyRouterCheckTool); err != nil {
-				return fmt.Errorf("missing route table check tool: %w", err)
-			}
 			logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 				Level: slog.Level(rootCmd.Verbosity),
 			}))
-			ctx := logr.NewContextWithSlogLogger(cmd.Context(), logger)
+			ctx = logr.NewContextWithSlogLogger(ctx, logger)
 			cmd.SetContext(ctx)
 			return nil
 		},
@@ -55,72 +52,72 @@ func NewCmdRoot() (*cobra.Command, error) {
 		},
 		SilenceUsage: true,
 	}
-	cmd.Flags().StringVarP(&rootCmd.RouterCheckFlags.ConfigDir, "config-dir", "c", "", "directory containing virtualservices")
-	cmd.Flags().StringVarP(&rootCmd.RouterCheckFlags.TestDir, "test-dir", "t", "", "directory containing tests")
-	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.Details, "details", "d", true, "print detailed information about the test results")
-	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.DisableDeprecationCheck, "disable-deprecation-check", "", true, "disable deprecation check")
-	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.OnlyShowFailures, "only-show-failures", "", false, "only show failures")
-	cmd.Flags().Float64VarP(&rootCmd.RouterCheckFlags.FailUnder, "fail-under", "f", 0.0, "threshold for failure")
-	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.CoverageAll, "covall", "", false, "measure coverage by checking all route fields")
-	cmd.Flags().StringVarP(&rootCmd.RouterCheckFlags.OutputDir, "output-dir", "o", "", "output directory for coverage information")
-	cmd.Flags().BoolVarP(&rootCmd.RouterCheckFlags.DetailedCoverage, "detailed-coverage", "", false, "print detailed coverage information")
-	cmd.Flags().IntVarP(&rootCmd.Verbosity, "", "v", 1, "log verbosity level")
 
-	requiredFlags := []string{"config-dir", "test-dir"}
-	for _, flag := range requiredFlags {
+	cmd.Flags().IntVarP(&rootCmd.Verbosity, "", "v", LevelInfo, "Log verbosity level")
+	cmd.Flags().StringVarP(&rootCmd.Gateway, "gateway", "", "", "Only consider VirtualServices bound to this gateway (i.e: istio-system/istio-ingressgateway)")
+	cmd.Flags().StringVarP(&rootCmd.ConfigDir, "config-dir", "c", "", "Directory with Istio VirtualService and Gateway files")
+	cmd.Flags().StringVarP(&rootCmd.TestDir, "test-dir", "t", "", "Directory with Envoy test files")
+	cmd.Flags().BoolVarP(&rootCmd.ConvertTests, "convert-tests", "", false, "Convert istio-config-validator tests into Envoy tests")
+	cmd.Flags().StringVarP(&rootCmd.OutputDir, "output-dir", "o", "", "Directory to output Envoy routes and tests")
+
+	for _, flag := range []string{"output-dir", "config-dir", "test-dir"} {
 		if err := cmd.MarkFlagRequired(flag); err != nil {
 			return nil, fmt.Errorf("failed to mark flag %q required: %w", flag, err)
 		}
+		if err := cmd.MarkFlagDirname(flag); err != nil {
+			return nil, fmt.Errorf("failed to mark flag %q as dirname: %w", flag, err)
+		}
+	}
+
+	if err := cmd.Flags().MarkHidden("convert-tests"); err != nil {
+		return nil, fmt.Errorf("failed to mark flag hidden: %w", err)
 	}
 
 	return cmd, nil
 }
 
 func (c *RootCommand) Run(ctx context.Context) error {
-	log := logr.FromContextOrDiscard(ctx)
-	tempDir, err := os.MkdirTemp("", ".router-check-tool-")
-	if err != nil {
-		return fmt.Errorf("failed to create temp dir: %w", err)
+	if err := os.MkdirAll(c.OutputDir, os.ModePerm); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
-	testsFile := filepath.Join(tempDir, "tests.json")
-	routeFile := filepath.Join(tempDir, "routes.json")
-
-	if err := c.prepareTests(ctx, testsFile); err != nil {
-		return fmt.Errorf("failed to prepare tests: %w", err)
-	}
-
-	if err := c.prepareRoutes(ctx, routeFile); err != nil {
+	if err := c.prepareRoutes(ctx); err != nil {
 		return fmt.Errorf("failed to prepare routes: %w", err)
 	}
 
-	args := c.routerCheckFlags(routeFile, testsFile)
-	routerCheck := exec.Command(envoyRouterCheckTool, args...)
-
-	log.V(3).Info("running command", "command", routerCheck.String())
-	out, err := routerCheck.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("%s", out)
+	if c.ConvertTests {
+		if err := c.prepareTests(ctx); err != nil {
+			return fmt.Errorf("failed to prepare istio-config-validator tests: %w", err)
+		}
+		return nil
 	}
 
-	fmt.Println(string(out))
+	if err := c.prepareEnvoyTests(ctx); err != nil {
+		return fmt.Errorf("failed to prepare envoy tests: %w", err)
+	}
+
 	return nil
 }
 
-func (c *RootCommand) prepareTests(ctx context.Context, outputFile string) error {
+func (c *RootCommand) prepareEnvoyTests(ctx context.Context) error {
 	log := logr.FromContextOrDiscard(ctx)
+	if c.TestDir == "" {
+		log.V(LevelDebug).Info("no envoy test directory provided")
+		return nil
+	}
 
-	log.V(3).Info("reading tests", "dir", c.RouterCheckFlags.TestDir)
-	tests, err := helpers.ReadEnvoyTests(c.RouterCheckFlags.TestDir)
+	log.Info("reading tests", "dir", c.TestDir)
+	tests, err := envoy.ReadTests(c.TestDir)
 	if err != nil {
-		return fmt.Errorf("failed to read test files: %w", err)
+		return fmt.Errorf("failed to read envoy test files: %w", err)
 	}
 
 	rawTests, err := json.Marshal(tests)
 	if err != nil {
 		return fmt.Errorf("failed to marshal tests: %w", err)
 	}
-	log.V(3).Info("writing tests", "file", outputFile)
+	outputFile := filepath.Join(c.OutputDir, "tests.json")
+	log.Info("writing tests", "file", outputFile)
 	err = os.WriteFile(outputFile, rawTests, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to write tests: %w", err)
@@ -128,65 +125,127 @@ func (c *RootCommand) prepareTests(ctx context.Context, outputFile string) error
 	return nil
 }
 
-func (c *RootCommand) prepareRoutes(ctx context.Context, outputFile string) error {
+func (c *RootCommand) prepareRoutes(ctx context.Context) error {
 	log := logr.FromContextOrDiscard(ctx)
 
-	log.V(3).Info("reading virtualservices")
-	cfg, err := helpers.ReadCRDs(c.RouterCheckFlags.ConfigDir)
+	log.Info("reading virtualservices")
+	cfg, err := envoy.ReadCRDs(c.ConfigDir)
 	if err != nil {
 		return fmt.Errorf("failed to read config files: %w", err)
 	}
+	routeGen := envoy.NewRouteGenerator(
+		envoy.WithConfigs(cfg),
+		envoy.WithGateway(c.Gateway),
+	)
 
-	routeGen := &envoy.RouteGenerator{
-		Configs: cfg,
-	}
 	routes, err := routeGen.Routes()
 	if err != nil {
 		return fmt.Errorf("failed to generate routes: %w", err)
 	}
-	if len(routes) != 1 {
-		return fmt.Errorf("expected exactly one route, got %d. Parsed %d configs", len(routes), len(cfg))
+	if len(routes) <= 0 {
+		return fmt.Errorf("expected at least one route, got %d. Parsed %d configs", len(routes), len(cfg))
 	}
-	route := routes[0]
-	raw, err := protomarshal.ToJSON(route)
-	if err != nil {
-		return fmt.Errorf("failed to marshal route: %w", err)
-	}
-
-	log.V(3).Info("writing route", "route", route.Name, "file", outputFile)
-	err = os.WriteFile(outputFile, []byte(raw), os.ModePerm)
-	if err != nil {
-		return fmt.Errorf("failed to write route: %w", err)
+	for _, route := range routes {
+		raw, err := protomarshal.ToJSON(route)
+		if err != nil {
+			return fmt.Errorf("failed to marshal route: %w", err)
+		}
+		routeName := fmt.Sprintf("route_%s_%s.json", cmp.Or(strings.ReplaceAll(c.Gateway, "/", "_"), "sidecar"), route.Name)
+		routeFile := filepath.Join(c.OutputDir, routeName)
+		log.Info("writing route", "route", route.Name, "file", routeFile)
+		err = os.WriteFile(routeFile, []byte(raw), os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("failed to write route: %w", err)
+		}
 	}
 	return nil
 }
 
-func (c *RootCommand) routerCheckFlags(configFile, testFile string) []string {
-	args := []string{
-		"--config-path", configFile,
-		"--test-path", testFile,
+func (c *RootCommand) prepareTests(ctx context.Context) error {
+	if c.TestDir == "" {
+		return nil
 	}
-	if c.RouterCheckFlags.Details {
-		args = append(args, "--details")
+	log := logr.FromContextOrDiscard(ctx)
+	log.Info("reading tests", "dir", c.TestDir)
+
+	oldFiles, err := helpers.WalkYAML(c.TestDir)
+	if err != nil {
+		return fmt.Errorf("could not read directory %s: %w", c.TestDir, err)
 	}
-	if c.RouterCheckFlags.DisableDeprecationCheck {
-		args = append(args, "--disable-deprecation-check")
+	testCases, err := parser.ParseTestCases(oldFiles)
+	if err != nil {
+		return fmt.Errorf("parsing testcases failed: %w", err)
 	}
-	if c.RouterCheckFlags.OnlyShowFailures {
-		args = append(args, "--only-show-failures")
+	var newTests envoy.Tests
+	for _, tc := range testCases {
+		inputs, err := tc.Request.Unfold()
+		if err != nil {
+			return fmt.Errorf("could not unfold request: %w", err)
+		}
+		if !tc.WantMatch {
+			log.V(LevelDebug).Info("skipping negative test", "test", tc.Description, "reason", "router_check_tool does not support negative tests")
+			continue
+		}
+		if tc.Rewrite != nil {
+			log.V(LevelDebug).Info("skipping rewrite test", "test", tc.Description, "reason", "format assertion is different in envoy tests")
+			continue
+		}
+		for _, req := range inputs {
+			var reqHeaders []envoy.Header
+			for key, value := range req.Headers {
+				reqHeaders = append(reqHeaders, envoy.Header{Key: key, Value: value})
+			}
+			input := envoy.Input{
+				SSL:                      true,
+				Authority:                req.Authority,
+				Method:                   cmp.Or(req.Method, http.MethodGet),
+				Path:                     cmp.Or(req.URI, "/"),
+				AdditionalRequestHeaders: reqHeaders,
+			}
+			validate, err := convertValidate(input, tc)
+			if err != nil {
+				return fmt.Errorf("could not convert test %q: %w", tc.Description, err)
+			}
+			newTests.Tests = append(newTests.Tests, envoy.Test{
+				TestName: fmt.Sprintf("%s: method=%q authority=%q path=%q headers=%+v", tc.Description, input.Method, input.Authority, input.Path, input.AdditionalRequestHeaders),
+				Input:    input,
+				Validate: validate,
+			})
+		}
 	}
-	if c.RouterCheckFlags.FailUnder != 0.0 {
-		args = append(args, "--fail-under", fmt.Sprintf("%f", c.RouterCheckFlags.FailUnder))
+	outputFile := filepath.Join(c.OutputDir, "tests.json")
+	log.Info("writing tests", "file", outputFile)
+	raw, err := json.Marshal(newTests)
+	if err != nil {
+		return fmt.Errorf("failed to marshal tests: %w", err)
 	}
-	if c.RouterCheckFlags.CoverageAll {
-		args = append(args, "--covall")
-	}
-	if c.RouterCheckFlags.OutputDir != "" {
-		args = append(args, "--output-dir", c.RouterCheckFlags.OutputDir)
-	}
-	if c.RouterCheckFlags.DetailedCoverage {
-		args = append(args, "--detailed-coverage")
+	err = os.WriteFile(outputFile, raw, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("failed to write tests: %w", err)
 	}
 
-	return args
+	return nil
+}
+
+func convertValidate(input envoy.Input, tc *parser.TestCase) (envoy.Validate, error) {
+	output := envoy.Validate{}
+	if tc.Route != nil {
+		var route *v1alpha3.HTTPRouteDestination
+		for _, r := range tc.Route {
+			if r.GetWeight() >= route.GetWeight() {
+				route = r
+			}
+		}
+		output.ClusterName = fmt.Sprintf("outbound|%d|%s|%s",
+			cmp.Or(route.GetDestination().GetPort().GetNumber(), 80),
+			route.GetDestination().GetSubset(),
+			route.GetDestination().GetHost(),
+		)
+	}
+	if tc.Redirect != nil {
+		authority := cmp.Or(tc.Redirect.GetAuthority(), input.Authority)
+		scheme := cmp.Or(tc.Redirect.GetScheme(), "https")
+		output.PathRedirect = fmt.Sprintf("%s://%s%s", scheme, authority, tc.Redirect.GetUri())
+	}
+	return output, nil
 }
