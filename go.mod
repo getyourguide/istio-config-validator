@@ -10,7 +10,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v1.22.2
+	istio.io/api v1.23.0-alpha.0
 	istio.io/client-go v1.22.2
 	istio.io/istio v0.0.0-20240702012549-b64a2f6240c6
 	k8s.io/apimachinery v0.30.2
