@@ -29,7 +29,11 @@ func TestRootCommand(t *testing.T) {
 		if os.Getenv("CI") == "true" {
 			t.Skip("skip as it requires router_check_tool binary not yet in CI")
 		}
-		cmdRoot.SetArgs([]string{"--config-dir", "testdata/virtualservice.yml", "--test-dir", "testdata/test.yml"})
+		cmdRoot.SetArgs([]string{
+			"--config-dir", "testdata/virtualservice.yml",
+			"--test-dir", "testdata/test.yml",
+			"--output-dir", "/tmp/output",
+		})
 		err = cmdRoot.Execute()
 		require.NoError(t, err)
 	})
