@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: example
+  namespace: example
+spec:
+  hosts: www.example.com # invalid type
+  http:
+  - match:
+    - uri:
+      regex: /users(/.*)?
+    route:
+    - destination:
+        host: users.users.svc.cluster.local
+        port:
+          number: 80

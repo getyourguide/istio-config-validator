@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -107,20 +108,18 @@ func (r *Request) Unfold() ([]Input, error) {
 	return out, nil
 }
 
-func ParseTestCases(files []string) ([]*TestCase, error) {
+func ParseTestCases(files []string, strict bool) ([]*TestCase, error) {
 	out := []*TestCase{}
 
 	for _, file := range files {
 		fileContent, err := os.ReadFile(file)
 		if err != nil {
-			return []*TestCase{}, fmt.Errorf("reading file '%s' failed: %w", file, err)
+			return nil, fmt.Errorf("reading file '%s' failed: %w", file, err)
 		}
 
 		decoder := yamlV3.NewDecoder(strings.NewReader(string(fileContent)))
-
 		for {
 			var testcaseInterface interface{}
-
 			if err = decoder.Decode(&testcaseInterface); err != nil {
 				if errors.Is(err, io.EOF) {
 					break
@@ -132,14 +131,17 @@ func ParseTestCases(files []string) ([]*TestCase, error) {
 
 			jsonBytes, err := json.Marshal(testcaseInterface)
 			if err != nil {
-				return []*TestCase{}, fmt.Errorf("yamltojson conversion failed for file '%s': %w", file, err)
+				return nil, fmt.Errorf("yamltojson conversion failed for file '%s': %w", file, err)
+			}
+			jsonDecoder := json.NewDecoder(bytes.NewReader(jsonBytes))
+			if strict {
+				jsonDecoder.DisallowUnknownFields()
 			}
 
-			yamlFile := &TestCaseYAML{}
-			err = json.Unmarshal(jsonBytes, yamlFile)
-			if err != nil {
+			var yamlFile TestCaseYAML
+			if err := jsonDecoder.Decode(&yamlFile); err != nil {
 				slog.Debug("unmarshaling failed for file '%s': %w", file, err)
-				return []*TestCase{}, err
+				return nil, fmt.Errorf("unmarshaling failed for file %q: %w", file, err)
 
 			}
 

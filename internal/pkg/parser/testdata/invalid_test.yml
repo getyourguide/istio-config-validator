@@ -1,0 +1,16 @@
+testCases:
+  - description: a test
+    unknownField: true # not a valid field
+    wantMatch: true
+    request:
+      authority:
+        - www.example.com
+      method:
+        - GET
+      uri:
+        - /users
+    route:
+    - destination:
+        host: users.users.svc.cluster.local
+        port:
+          number: 80

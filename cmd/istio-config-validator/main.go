@@ -30,6 +30,8 @@ func main() {
 	var testCaseParams multiValueFlag
 	flag.Var(&testCaseParams, "t", "Testcase files/folders")
 	summaryOnly := flag.Bool("s", false, "show only summary of tests (in case of failures full details are shown)")
+	strict := flag.Bool("strict", false, "fail on unknown fields")
+
 	flag.Parse()
 	istioConfigFiles := getFiles(flag.Args())
 	testCaseFiles := getFiles(testCaseParams)
@@ -45,7 +47,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	summary, details, err := unit.Run(testCaseFiles, istioConfigFiles)
+	summary, details, err := unit.Run(testCaseFiles, istioConfigFiles, *strict)
 	if err != nil {
 		fmt.Println(strings.Join(details, "\n"))
 		log.Fatal(err.Error())

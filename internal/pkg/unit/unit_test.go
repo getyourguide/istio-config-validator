@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
+	"github.com/stretchr/testify/require"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
 	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -13,21 +14,17 @@ import (
 func TestRun(t *testing.T) {
 	testcasefiles := []string{"../../../examples/virtualservice_test.yml"}
 	configfiles := []string{"../../../examples/virtualservice.yml"}
-
-	_, _, err := Run(testcasefiles, configfiles)
-	if err != nil {
-		t.Error(err)
-	}
+	var strict bool
+	_, _, err := Run(testcasefiles, configfiles, strict)
+	require.NoError(t, err)
 }
 
 func TestRunDelegate(t *testing.T) {
 	testcasefiles := []string{"../../../examples/virtualservice_delegate_test.yml"}
 	configfiles := []string{"../../../examples/delegate_virtualservice.yml"}
-
-	_, _, err := Run(testcasefiles, configfiles)
-	if err != nil {
-		t.Error(err)
-	}
+	var strict bool
+	_, _, err := Run(testcasefiles, configfiles, strict)
+	require.NoError(t, err)
 }
 
 func TestGetRoute(t *testing.T) {
