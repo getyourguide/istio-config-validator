@@ -4,7 +4,17 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestUnknownField(t *testing.T) {
+	testsFiles := []string{"testdata/invalid_test.yml"}
+	_, err := ParseTestCases(testsFiles, true)
+	require.ErrorContains(t, err, "json: unknown field")
+
+	_, err = ParseTestCases(testsFiles, false)
+	require.NoError(t, err)
+}
 
 func TestParseTestCases(t *testing.T) {
 	expectedTestCases := []*TestCase{
@@ -12,18 +22,13 @@ func TestParseTestCases(t *testing.T) {
 		{Description: "Partner service only accepts GET or OPTIONS"},
 	}
 	testcasefiles := []string{"../../../examples/virtualservice_test.yml"}
-	configfiles := []string{"../../../examples/virtualservice.yml"}
-	parser, err := New(testcasefiles, configfiles)
-	if err != nil {
-		t.Errorf("error getting test cases %v", err)
-	}
-	if len(parser.TestCases) == 0 {
-		t.Error("test cases are empty")
-	}
+	testCases, err := ParseTestCases(testcasefiles, false)
+	require.NoError(t, err)
+	require.NotEmpty(t, testCases)
 
 	for _, expected := range expectedTestCases {
 		testPass := false
-		for _, out := range parser.TestCases {
+		for _, out := range testCases {
 			if expected.Description == out.Description {
 				testPass = true
 			}
@@ -31,7 +36,6 @@ func TestParseTestCases(t *testing.T) {
 		if !testPass {
 			t.Errorf("could not find expected description:'%v'", expected.Description)
 		}
-
 	}
 }
 

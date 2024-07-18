@@ -14,15 +14,21 @@ import (
 )
 
 // Run is the entrypoint to run all unit tests defined in test cases
-func Run(testfiles, configfiles []string) ([]string, []string, error) {
+func Run(testfiles, configfiles []string, strict bool) ([]string, []string, error) {
 	var summary, details []string
-	parsed, err := parser.New(testfiles, configfiles)
+
+	testCases, err := parser.ParseTestCases(testfiles, strict)
 	if err != nil {
-		return summary, details, err
+		return nil, nil, fmt.Errorf("parsing testcases failed: %w", err)
+	}
+
+	virtualServices, err := parser.ParseVirtualServices(configfiles)
+	if err != nil {
+		return nil, nil, fmt.Errorf("parsing virtualservices failed: %w", err)
 	}
 
 	inputCount := 0
-	for _, testCase := range parsed.TestCases {
+	for _, testCase := range testCases {
 		details = append(details, "running test: "+testCase.Description)
 		inputs, err := testCase.Request.Unfold()
 		if err != nil {
@@ -30,7 +36,7 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 		}
 		for _, input := range inputs {
 			checkHosts := true
-			route, err := GetRoute(input, parsed.VirtualServices, checkHosts)
+			route, err := GetRoute(input, virtualServices, checkHosts)
 			if err != nil {
 				details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 				return summary, details, fmt.Errorf("error getting destinations: %v", err)
@@ -44,7 +50,7 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 					details = append(details, fmt.Sprintf("PASS input:[%v]", input))
 				}
 				if testCase.Route != nil {
-					vs, err := GetDelegatedVirtualService(route.Delegate, parsed.VirtualServices)
+					vs, err := GetDelegatedVirtualService(route.Delegate, virtualServices)
 					if err != nil {
 						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 						return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
@@ -89,7 +95,7 @@ func Run(testfiles, configfiles []string) ([]string, []string, error) {
 	}
 	summary = append(summary, "Test summary:")
 	summary = append(summary, fmt.Sprintf(" - %d testfiles, %d configfiles", len(testfiles), len(configfiles)))
-	summary = append(summary, fmt.Sprintf(" - %d testcases with %d inputs passed", len(parsed.TestCases), inputCount))
+	summary = append(summary, fmt.Sprintf(" - %d testcases with %d inputs passed", len(testCases), inputCount))
 	return summary, details, nil
 }
 
