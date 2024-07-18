@@ -22,7 +22,7 @@ func Run(testfiles, configfiles []string, strict bool) ([]string, []string, erro
 		return nil, nil, fmt.Errorf("parsing testcases failed: %w", err)
 	}
 
-	virtualServices, err := parser.ParseVirtualServices(configfiles, strict)
+	virtualServices, err := parser.ParseVirtualServices(configfiles)
 	if err != nil {
 		return nil, nil, fmt.Errorf("parsing virtualservices failed: %w", err)
 	}

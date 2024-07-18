@@ -114,7 +114,7 @@ func ParseTestCases(files []string, strict bool) ([]*TestCase, error) {
 	for _, file := range files {
 		fileContent, err := os.ReadFile(file)
 		if err != nil {
-			return nil, fmt.Errorf("reading file '%s' failed: %w", file, err)
+			return nil, fmt.Errorf("reading file %q failed: %w", file, err)
 		}
 
 		decoder := yamlV3.NewDecoder(strings.NewReader(string(fileContent)))
@@ -131,7 +131,7 @@ func ParseTestCases(files []string, strict bool) ([]*TestCase, error) {
 
 			jsonBytes, err := json.Marshal(testcaseInterface)
 			if err != nil {
-				return nil, fmt.Errorf("yamltojson conversion failed for file '%s': %w", file, err)
+				return nil, fmt.Errorf("yamltojson conversion failed for file %q: %w", file, err)
 			}
 			jsonDecoder := json.NewDecoder(bytes.NewReader(jsonBytes))
 			if strict {
@@ -140,7 +140,7 @@ func ParseTestCases(files []string, strict bool) ([]*TestCase, error) {
 
 			var yamlFile TestCaseYAML
 			if err := jsonDecoder.Decode(&yamlFile); err != nil {
-				slog.Debug("unmarshaling failed for file '%s': %w", file, err)
+				slog.Debug("unmarshaling failed for file %q: %w", file, err)
 				return nil, fmt.Errorf("unmarshaling failed for file %q: %w", file, err)
 
 			}

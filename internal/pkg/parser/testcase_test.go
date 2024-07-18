@@ -8,8 +8,12 @@ import (
 )
 
 func TestUnknownField(t *testing.T) {
-	_, err := ParseTestCases([]string{"testdata/invalid_test.yml"}, true)
+	testsFiles := []string{"testdata/invalid_test.yml"}
+	_, err := ParseTestCases(testsFiles, true)
 	require.ErrorContains(t, err, "json: unknown field")
+
+	_, err = ParseTestCases(testsFiles, false)
+	require.NoError(t, err)
 }
 
 func TestParseTestCases(t *testing.T) {

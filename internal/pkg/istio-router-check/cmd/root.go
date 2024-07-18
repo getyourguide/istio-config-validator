@@ -172,7 +172,8 @@ func (c *RootCommand) prepareTests(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("could not read directory %s: %w", c.TestDir, err)
 	}
-	testCases, err := parser.ParseTestCases(oldFiles, true)
+	strict := true
+	testCases, err := parser.ParseTestCases(oldFiles, strict)
 	if err != nil {
 		return fmt.Errorf("parsing testcases failed: %w", err)
 	}

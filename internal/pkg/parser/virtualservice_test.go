@@ -14,7 +14,7 @@ func TestParseVirtualServices(t *testing.T) {
 		Hosts: []string{"www.example.com", "example.com"},
 	}}}
 	configfiles := []string{"../../../examples/virtualservice.yml"}
-	virtualServices, err := ParseVirtualServices(configfiles, false)
+	virtualServices, err := ParseVirtualServices(configfiles)
 	require.NoError(t, err)
 	require.NotEmpty(t, virtualServices)
 
@@ -31,7 +31,7 @@ func TestParseMultipleVirtualServices(t *testing.T) {
 	}}}
 
 	configfiles := []string{"../../../examples/multidocument_virtualservice.yml"}
-	virtualServices, err := ParseVirtualServices(configfiles, false)
+	virtualServices, err := ParseVirtualServices(configfiles)
 	require.NoError(t, err)
 	require.NotEmpty(t, virtualServices)
 	require.GreaterOrEqual(t, len(virtualServices), 2)
@@ -44,6 +44,7 @@ func TestParseMultipleVirtualServices(t *testing.T) {
 }
 
 func TestVirtualServiceUnknownFields(t *testing.T) {
-	_, err := ParseVirtualServices([]string{"testdata/invalid_vs.yml"}, true)
+	vsFiles := []string{"testdata/invalid_vs.yml"}
+	_, err := ParseVirtualServices(vsFiles)
 	require.ErrorContains(t, err, "cannot parse proto message")
 }
