@@ -3,16 +3,15 @@ module github.com/getyourguide/istio-config-validator
 go 1.22.0
 
 require (
-	github.com/envoyproxy/go-control-plane v0.12.1-0.20240716023226-bc563f4e9b28
+	github.com/envoyproxy/go-control-plane v0.12.1-0.20240719165848-f888b4f71207
 	github.com/go-logr/logr v1.4.2
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
 	gopkg.in/yaml.v3 v3.0.1
 	istio.io/api v1.23.0-alpha.0
-	istio.io/client-go v1.22.2
+	istio.io/client-go v1.22.3
 	istio.io/istio v0.0.0-20240702012549-b64a2f6240c6
-	k8s.io/apimachinery v0.30.2
+	k8s.io/apimachinery v0.30.3
 )
 
 require (
@@ -122,6 +121,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect
