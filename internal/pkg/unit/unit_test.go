@@ -6,9 +6,9 @@ import (
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
 	"github.com/stretchr/testify/require"
-	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
-	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	networking "istio.io/api/networking/v1"
+	v1 "istio.io/client-go/pkg/apis/networking/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestRun(t *testing.T) {
@@ -30,26 +30,26 @@ func TestRunDelegate(t *testing.T) {
 func TestGetRoute(t *testing.T) {
 	type args struct {
 		input           parser.Input
-		virtualServices []*v1alpha3.VirtualService
+		virtualServices []*v1.VirtualService
 		checkHosts      bool
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *networkingv1alpha3.HTTPRoute
+		want    *networking.HTTPRoute
 		wantErr bool
 	}{
 		{
 			name: "no host match, empty destination",
 			args: args{
 				input: parser.Input{Authority: "www.exemple.com", URI: "/"},
-				virtualServices: []*v1alpha3.VirtualService{{
-					Spec: networkingv1alpha3.VirtualService{
+				virtualServices: []*v1.VirtualService{{
+					Spec: networking.VirtualService{
 						Hosts: []string{"www.another-example.com"},
-						Http: []*networkingv1alpha3.HTTPRoute{{
-							Match: []*networkingv1alpha3.HTTPMatchRequest{{
-								Uri: &networkingv1alpha3.StringMatch{
-									MatchType: &networkingv1alpha3.StringMatch_Exact{
+						Http: []*networking.HTTPRoute{{
+							Match: []*networking.HTTPMatchRequest{{
+								Uri: &networking.StringMatch{
+									MatchType: &networking.StringMatch_Exact{
 										Exact: "/",
 									},
 								},
@@ -59,27 +59,27 @@ func TestGetRoute(t *testing.T) {
 				}},
 				checkHosts: true,
 			},
-			want:    &networkingv1alpha3.HTTPRoute{},
+			want:    &networking.HTTPRoute{},
 			wantErr: false,
 		},
 		{
 			name: "match a fallback destination",
 			args: args{
 				input: parser.Input{Authority: "www.example.com", URI: "/path-to-fallback"},
-				virtualServices: []*v1alpha3.VirtualService{{
-					Spec: networkingv1alpha3.VirtualService{
+				virtualServices: []*v1.VirtualService{{
+					Spec: networking.VirtualService{
 						Hosts: []string{"www.example.com"},
-						Http: []*networkingv1alpha3.HTTPRoute{{
-							Match: []*networkingv1alpha3.HTTPMatchRequest{{
-								Uri: &networkingv1alpha3.StringMatch{
-									MatchType: &networkingv1alpha3.StringMatch_Exact{
+						Http: []*networking.HTTPRoute{{
+							Match: []*networking.HTTPMatchRequest{{
+								Uri: &networking.StringMatch{
+									MatchType: &networking.StringMatch_Exact{
 										Exact: "/",
 									},
 								},
 							}},
 						}, {
-							Route: []*networkingv1alpha3.HTTPRouteDestination{{
-								Destination: &networkingv1alpha3.Destination{
+							Route: []*networking.HTTPRouteDestination{{
+								Destination: &networking.Destination{
 									Host: "fallback.fallback.svc.cluster.local",
 								},
 							}},
@@ -88,9 +88,9 @@ func TestGetRoute(t *testing.T) {
 				}},
 				checkHosts: true,
 			},
-			want: &networkingv1alpha3.HTTPRoute{
-				Route: []*networkingv1alpha3.HTTPRouteDestination{{
-					Destination: &networkingv1alpha3.Destination{
+			want: &networking.HTTPRoute{
+				Route: []*networking.HTTPRouteDestination{{
+					Destination: &networking.Destination{
 						Host: "fallback.fallback.svc.cluster.local",
 					},
 				}},
@@ -101,18 +101,18 @@ func TestGetRoute(t *testing.T) {
 			name: "match single destination, multiple virtualservices",
 			args: args{
 				input: parser.Input{Authority: "www.match.com", URI: "/"},
-				virtualServices: []*v1alpha3.VirtualService{{
-					Spec: networkingv1alpha3.VirtualService{
+				virtualServices: []*v1.VirtualService{{
+					Spec: networking.VirtualService{
 						Hosts: []string{"www.notmatch.com"},
-						Http: []*networkingv1alpha3.HTTPRoute{{
-							Route: []*networkingv1alpha3.HTTPRouteDestination{{
-								Destination: &networkingv1alpha3.Destination{
+						Http: []*networking.HTTPRoute{{
+							Route: []*networking.HTTPRouteDestination{{
+								Destination: &networking.Destination{
 									Host: "notmatch.notmatch.svc.cluster.local",
 								},
 							}},
-							Match: []*networkingv1alpha3.HTTPMatchRequest{{
-								Uri: &networkingv1alpha3.StringMatch{
-									MatchType: &networkingv1alpha3.StringMatch_Exact{
+							Match: []*networking.HTTPMatchRequest{{
+								Uri: &networking.StringMatch{
+									MatchType: &networking.StringMatch_Exact{
 										Exact: "/",
 									},
 								},
@@ -120,17 +120,17 @@ func TestGetRoute(t *testing.T) {
 						}},
 					},
 				}, {
-					Spec: networkingv1alpha3.VirtualService{
+					Spec: networking.VirtualService{
 						Hosts: []string{"www.match.com"},
-						Http: []*networkingv1alpha3.HTTPRoute{{
-							Route: []*networkingv1alpha3.HTTPRouteDestination{{
-								Destination: &networkingv1alpha3.Destination{
+						Http: []*networking.HTTPRoute{{
+							Route: []*networking.HTTPRouteDestination{{
+								Destination: &networking.Destination{
 									Host: "match.match.svc.cluster.local",
 								},
 							}},
-							Match: []*networkingv1alpha3.HTTPMatchRequest{{
-								Uri: &networkingv1alpha3.StringMatch{
-									MatchType: &networkingv1alpha3.StringMatch_Exact{
+							Match: []*networking.HTTPMatchRequest{{
+								Uri: &networking.StringMatch{
+									MatchType: &networking.StringMatch_Exact{
 										Exact: "/",
 									},
 								},
@@ -140,14 +140,14 @@ func TestGetRoute(t *testing.T) {
 				}},
 				checkHosts: true,
 			},
-			want: &networkingv1alpha3.HTTPRoute{
-				Route: []*networkingv1alpha3.HTTPRouteDestination{{
-					Destination: &networkingv1alpha3.Destination{
+			want: &networking.HTTPRoute{
+				Route: []*networking.HTTPRouteDestination{{
+					Destination: &networking.Destination{
 						Host: "match.match.svc.cluster.local",
 					},
-				}}, Match: []*networkingv1alpha3.HTTPMatchRequest{{
-					Uri: &networkingv1alpha3.StringMatch{
-						MatchType: &networkingv1alpha3.StringMatch_Exact{
+				}}, Match: []*networking.HTTPMatchRequest{{
+					Uri: &networking.StringMatch{
+						MatchType: &networking.StringMatch_Exact{
 							Exact: "/",
 						},
 					},
@@ -159,18 +159,18 @@ func TestGetRoute(t *testing.T) {
 			name: "match and assert rewrite and destination",
 			args: args{
 				input: parser.Input{Authority: "www.match.com", URI: "/"},
-				virtualServices: []*v1alpha3.VirtualService{{
-					Spec: networkingv1alpha3.VirtualService{
+				virtualServices: []*v1.VirtualService{{
+					Spec: networking.VirtualService{
 						Hosts: []string{"www.match.com"},
-						Http: []*networkingv1alpha3.HTTPRoute{{
-							Route: []*networkingv1alpha3.HTTPRouteDestination{{
-								Destination: &networkingv1alpha3.Destination{
+						Http: []*networking.HTTPRoute{{
+							Route: []*networking.HTTPRouteDestination{{
+								Destination: &networking.Destination{
 									Host: "match.match.svc.cluster.local",
 								},
 							}},
-							Match: []*networkingv1alpha3.HTTPMatchRequest{{
-								Uri: &networkingv1alpha3.StringMatch{
-									MatchType: &networkingv1alpha3.StringMatch_Exact{
+							Match: []*networking.HTTPMatchRequest{{
+								Uri: &networking.StringMatch{
+									MatchType: &networking.StringMatch_Exact{
 										Exact: "/",
 									},
 								},
@@ -180,15 +180,15 @@ func TestGetRoute(t *testing.T) {
 				}},
 				checkHosts: true,
 			},
-			want: &networkingv1alpha3.HTTPRoute{
-				Route: []*networkingv1alpha3.HTTPRouteDestination{{
-					Destination: &networkingv1alpha3.Destination{
+			want: &networking.HTTPRoute{
+				Route: []*networking.HTTPRouteDestination{{
+					Destination: &networking.Destination{
 						Host: "match.match.svc.cluster.local",
 					},
 				}},
-				Match: []*networkingv1alpha3.HTTPMatchRequest{{
-					Uri: &networkingv1alpha3.StringMatch{
-						MatchType: &networkingv1alpha3.StringMatch_Exact{
+				Match: []*networking.HTTPMatchRequest{{
+					Uri: &networking.StringMatch{
+						MatchType: &networking.StringMatch_Exact{
 							Exact: "/",
 						},
 					},
@@ -200,17 +200,17 @@ func TestGetRoute(t *testing.T) {
 			name: "match virtualservice with no hosts",
 			args: args{
 				input: parser.Input{Authority: "www.match.com", URI: "/"},
-				virtualServices: []*v1alpha3.VirtualService{{
-					Spec: networkingv1alpha3.VirtualService{
-						Http: []*networkingv1alpha3.HTTPRoute{{
-							Route: []*networkingv1alpha3.HTTPRouteDestination{{
-								Destination: &networkingv1alpha3.Destination{
+				virtualServices: []*v1.VirtualService{{
+					Spec: networking.VirtualService{
+						Http: []*networking.HTTPRoute{{
+							Route: []*networking.HTTPRouteDestination{{
+								Destination: &networking.Destination{
 									Host: "match.match.svc.cluster.local",
 								},
 							}},
-							Match: []*networkingv1alpha3.HTTPMatchRequest{{
-								Uri: &networkingv1alpha3.StringMatch{
-									MatchType: &networkingv1alpha3.StringMatch_Exact{
+							Match: []*networking.HTTPMatchRequest{{
+								Uri: &networking.StringMatch{
+									MatchType: &networking.StringMatch_Exact{
 										Exact: "/",
 									},
 								},
@@ -220,14 +220,14 @@ func TestGetRoute(t *testing.T) {
 				}},
 				checkHosts: false,
 			},
-			want: &networkingv1alpha3.HTTPRoute{
-				Route: []*networkingv1alpha3.HTTPRouteDestination{{
-					Destination: &networkingv1alpha3.Destination{
+			want: &networking.HTTPRoute{
+				Route: []*networking.HTTPRouteDestination{{
+					Destination: &networking.Destination{
 						Host: "match.match.svc.cluster.local",
 					},
-				}}, Match: []*networkingv1alpha3.HTTPMatchRequest{{
-					Uri: &networkingv1alpha3.StringMatch{
-						MatchType: &networkingv1alpha3.StringMatch_Exact{
+				}}, Match: []*networking.HTTPMatchRequest{{
+					Uri: &networking.StringMatch{
+						MatchType: &networking.StringMatch_Exact{
 							Exact: "/",
 						},
 					},
@@ -252,30 +252,30 @@ func TestGetRoute(t *testing.T) {
 
 func TestGetDelegatedVirtualService(t *testing.T) {
 	type args struct {
-		delegate        *networkingv1alpha3.Delegate
-		virtualServices []*v1alpha3.VirtualService
+		delegate        *networking.Delegate
+		virtualServices []*v1.VirtualService
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *v1alpha3.VirtualService
+		want    *v1.VirtualService
 		wantErr bool
 	}{
 		{
 			name: "match",
 			args: args{
-				delegate: &networkingv1alpha3.Delegate{
+				delegate: &networking.Delegate{
 					Name: "delegate",
 				},
-				virtualServices: []*v1alpha3.VirtualService{{
-					ObjectMeta: v1.ObjectMeta{
+				virtualServices: []*v1.VirtualService{{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "delegate",
 						Namespace: "default",
 					},
 				}},
 			},
-			want: &v1alpha3.VirtualService{
-				ObjectMeta: v1.ObjectMeta{
+			want: &v1.VirtualService{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "delegate",
 					Namespace: "default",
 				},
@@ -284,24 +284,24 @@ func TestGetDelegatedVirtualService(t *testing.T) {
 		}, {
 			name: "match with namespace",
 			args: args{
-				delegate: &networkingv1alpha3.Delegate{
+				delegate: &networking.Delegate{
 					Name:      "delegate",
 					Namespace: "test",
 				},
-				virtualServices: []*v1alpha3.VirtualService{{
-					ObjectMeta: v1.ObjectMeta{
+				virtualServices: []*v1.VirtualService{{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "delegate",
 						Namespace: "default",
 					},
 				}, {
-					ObjectMeta: v1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "delegate",
 						Namespace: "test",
 					},
 				}},
 			},
-			want: &v1alpha3.VirtualService{
-				ObjectMeta: v1.ObjectMeta{
+			want: &v1.VirtualService{
+				ObjectMeta: metav1.ObjectMeta{
 					Name:      "delegate",
 					Namespace: "test",
 				},
@@ -310,11 +310,11 @@ func TestGetDelegatedVirtualService(t *testing.T) {
 		}, {
 			name: "no match",
 			args: args{
-				delegate: &networkingv1alpha3.Delegate{
+				delegate: &networking.Delegate{
 					Name: "delegate",
 				},
-				virtualServices: []*v1alpha3.VirtualService{{
-					ObjectMeta: v1.ObjectMeta{
+				virtualServices: []*v1.VirtualService{{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "delegate-abc",
 						Namespace: "default",
 					},
@@ -325,17 +325,17 @@ func TestGetDelegatedVirtualService(t *testing.T) {
 		}, {
 			name: "no match with namespace",
 			args: args{
-				delegate: &networkingv1alpha3.Delegate{
+				delegate: &networking.Delegate{
 					Name:      "delegate",
 					Namespace: "production",
 				},
-				virtualServices: []*v1alpha3.VirtualService{{
-					ObjectMeta: v1.ObjectMeta{
+				virtualServices: []*v1.VirtualService{{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "delegate",
 						Namespace: "default",
 					},
 				}, {
-					ObjectMeta: v1.ObjectMeta{
+					ObjectMeta: metav1.ObjectMeta{
 						Name:      "delegate",
 						Namespace: "test",
 					},
