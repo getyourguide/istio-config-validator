@@ -9,8 +9,8 @@ import (
 	"slices"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/parser"
-	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
-	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
+	networking "istio.io/api/networking/v1"
+	v1 "istio.io/client-go/pkg/apis/networking/v1"
 )
 
 // Run is the entrypoint to run all unit tests defined in test cases
@@ -56,7 +56,7 @@ func Run(testfiles, configfiles []string, strict bool) ([]string, []string, erro
 						return summary, details, fmt.Errorf("error getting delegate virtual service: %v", err)
 					}
 					checkHosts = false
-					route, err = GetRoute(input, []*v1alpha3.VirtualService{vs}, checkHosts)
+					route, err = GetRoute(input, []*v1.VirtualService{vs}, checkHosts)
 					if err != nil {
 						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
 						return summary, details, fmt.Errorf("error getting destinations for delegate %v: %v", route.Delegate, err)
@@ -100,7 +100,7 @@ func Run(testfiles, configfiles []string, strict bool) ([]string, []string, erro
 }
 
 // GetRoute returns the route that matched a given input.
-func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService, checkHosts bool) (*networkingv1alpha3.HTTPRoute, error) {
+func GetRoute(input parser.Input, virtualServices []*v1.VirtualService, checkHosts bool) (*networking.HTTPRoute, error) {
 	for _, vs := range virtualServices {
 		spec := &vs.Spec
 		if checkHosts && !slices.Contains(spec.Hosts, input.Authority) {
@@ -113,7 +113,7 @@ func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService, ch
 			}
 			for _, matchBlock := range httpRoute.Match {
 				if match, err := matchRequest(input, matchBlock); err != nil {
-					return &networkingv1alpha3.HTTPRoute{}, err
+					return &networking.HTTPRoute{}, err
 				} else if match {
 					return httpRoute, nil
 				}
@@ -121,11 +121,11 @@ func GetRoute(input parser.Input, virtualServices []*v1alpha3.VirtualService, ch
 		}
 	}
 
-	return &networkingv1alpha3.HTTPRoute{}, nil
+	return &networking.HTTPRoute{}, nil
 }
 
 // GetDelegatedVirtualService returns the virtualservice matching namespace/name matching the delegate argument.
-func GetDelegatedVirtualService(delegate *networkingv1alpha3.Delegate, virtualServices []*v1alpha3.VirtualService) (*v1alpha3.VirtualService, error) {
+func GetDelegatedVirtualService(delegate *networking.Delegate, virtualServices []*v1.VirtualService) (*v1.VirtualService, error) {
 	for _, vs := range virtualServices {
 		if vs.Name == delegate.Name {
 			if delegate.Namespace != "" && vs.Namespace != delegate.Namespace {
