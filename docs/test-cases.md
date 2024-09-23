@@ -1,6 +1,6 @@
 # TestCases Reference
 
-This document describes how one can define test cases to be used by the testing framework.
+This document describes how one can define test cases to be used by the testing framework. Refer to the [examples](https://github.com/getyourguide/istio-config-validator/tree/main/examples) to understand how to test different use cases.
 
 ## TestCases
 
