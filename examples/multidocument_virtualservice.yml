@@ -1,8 +1,8 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: example
-  namespace: example
+  name: example-2
+  namespace: example-2
 spec:
   gateways:
     - mesh
@@ -26,8 +26,8 @@ spec:
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: example
-  namespace: example
+  name: example-3
+  namespace: example-3
 spec:
   gateways:
     - mesh
