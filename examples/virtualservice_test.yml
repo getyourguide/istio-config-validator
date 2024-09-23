@@ -28,6 +28,15 @@ testCases:
 ---
 # Multidoc test
 testCases:
+  - description: Redirect /home to /
+    wantMatch: true
+    request:
+      authority: ["www.example.com"]
+      method: ["GET"]
+      uri: ["/home"]
+    redirect:
+      uri: "/"
+      authority: "www.example.com"
   - description: Reseller is rewritten as partner
     wantMatch: true
     request:

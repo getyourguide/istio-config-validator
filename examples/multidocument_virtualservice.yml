@@ -7,8 +7,8 @@ spec:
   gateways:
     - mesh
   hosts:
-    - www.example.com
-    - example.com
+    - www.example2.com
+    - example2.com
   http:
     - match:
         - uri:
@@ -32,8 +32,8 @@ spec:
   gateways:
     - mesh
   hosts:
-    - www.example.com
-    - example.com
+    - www.example3.com
+    - example3.com
   http:
     - match:
         - uri:

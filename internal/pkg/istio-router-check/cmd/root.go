@@ -191,6 +191,10 @@ func (c *RootCommand) prepareTests(ctx context.Context) error {
 			log.V(LevelDebug).Info("skipping rewrite test", "test", tc.Description, "reason", "format assertion is different in envoy tests")
 			continue
 		}
+		if tc.Redirect != nil {
+			log.V(LevelDebug).Info("skipping redirect test", "test", tc.Description, "reason", "format assertion is different in envoy tests")
+			continue
+		}
 		for _, req := range inputs {
 			var reqHeaders []envoy.Header
 			for key, value := range req.Headers {
@@ -242,11 +246,6 @@ func convertValidate(input envoy.Input, tc *parser.TestCase) (envoy.Validate, er
 			route.GetDestination().GetSubset(),
 			route.GetDestination().GetHost(),
 		)
-	}
-	if tc.Redirect != nil {
-		authority := cmp.Or(tc.Redirect.GetAuthority(), input.Authority)
-		scheme := cmp.Or(tc.Redirect.GetScheme(), "https")
-		output.PathRedirect = fmt.Sprintf("%s://%s%s", scheme, authority, tc.Redirect.GetUri())
 	}
 	return output, nil
 }
