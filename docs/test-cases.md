@@ -12,7 +12,7 @@ Test cases objects are interpreted by the framework to build up the mock and run
 
 ## TestCase
 
-TestCase defines each test that will be run sequentially.
+[TestCase](https://github.com/getyourguide/istio-config-validator/blob/195017ef364f89b773492f2108e4478188a754ff/internal/pkg/parser/testcase.go#L32-L42) defines each test that will be run sequentially.
 
 | Field       | Type                                                                                                            | Description                                                |
 |-------------|-----------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
@@ -29,7 +29,7 @@ TestCase defines each test that will be run sequentially.
 
 ## Request
 
-Request can contain more than one host (authority), method, uri, etc. The framework will mock requests in all possible combination defined here.
+[Request](https://github.com/getyourguide/istio-config-validator/blob/195017ef364f89b773492f2108e4478188a754ff/internal/pkg/parser/testcase.go#L45) can contain more than one host (authority), method, uri, etc. The framework will mock requests in all possible combination defined here.
 
 
 | Field     | Type              | Description                                                        |
