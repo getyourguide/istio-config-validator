@@ -39,7 +39,6 @@ func TestParseMultipleVirtualServices(t *testing.T) {
 		gotHosts = append(gotHosts, vs.Spec.Hosts...)
 	}
 	require.ElementsMatch(t, wantHosts, gotHosts)
-
 }
 
 func TestVirtualServiceUnknownFields(t *testing.T) {
