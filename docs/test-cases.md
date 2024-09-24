@@ -1,6 +1,6 @@
 # TestCases Reference
 
-This document describes how one can define test cases to be used by the testing framework.
+This document describes how one can define test cases to be used by the testing framework. Refer to the [examples](https://github.com/getyourguide/istio-config-validator/tree/main/examples) to understand how to test different use cases.
 
 ## TestCases
 
@@ -12,7 +12,7 @@ Test cases objects are interpreted by the framework to build up the mock and run
 
 ## TestCase
 
-TestCase defines each test that will be run sequentially.
+[TestCase](https://github.com/getyourguide/istio-config-validator/blob/195017ef364f89b773492f2108e4478188a754ff/internal/pkg/parser/testcase.go#L32-L42) defines each test that will be run sequentially.
 
 | Field       | Type                                                                                                            | Description                                                |
 |-------------|-----------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
@@ -20,11 +20,16 @@ TestCase defines each test that will be run sequentially.
 | wantMatch   | bool                                                                                                            | If the test case should assert `true` or `false`           |
 | request     | [request](#Request)                                                                                                         | Crafted requests that will mocked against VirtualServices  |
 | route       | [HTTPRouteDestination[]](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRouteDestination) | Route destinations that will be asserted for each request. |
+| redirect    | [HTTPRedirect](https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPRedirect)          | Any redirect logic to test
+| rewrite     | [HTTPRewrite](https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPRewrite)            | Any rewrite logic to test
+| fault       | [HTTPFaultInjection](https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPFaultInjection)   | Add fault injection (delay, abort) to test to test for timeouts, auth, etc.
+| headers     | [Headers](https://istio.io/latest/docs/reference/config/networking/virtual-service/#Headers)                    | Test header manipulation rules. These are different from `request.headers`, i.e. headers present in the test request.
+| delegate    | [Delegate](https://istio.io/latest/docs/reference/config/networking/virtual-service/#Delegate)                  | Any delegation logic to test
 
 
 ## Request
 
-Request can contain more than one host (authority), method, uri, etc. The framework will mock requests in all possible combination defined here.
+[Request](https://github.com/getyourguide/istio-config-validator/blob/195017ef364f89b773492f2108e4478188a754ff/internal/pkg/parser/testcase.go#L45) can contain more than one host (authority), method, uri, etc. The framework will mock requests in all possible combination defined here.
 
 
 | Field     | Type              | Description                                                        |
