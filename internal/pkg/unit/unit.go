@@ -87,7 +87,12 @@ func Run(testfiles, configfiles []string, strict bool) ([]string, []string, erro
 					return summary, details, fmt.Errorf("headers missmatch=%v, want %v, rule matched: %v", route.Headers, testCase.Headers, route.Match)
 				}
 			}
-
+			if testCase.Redirect != nil {
+				if reflect.DeepEqual(route.Redirect, testCase.Redirect) != testCase.WantMatch {
+					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
+					return summary, details, fmt.Errorf("redirect missmatch=%v, want %v, rule matched: %v", route.Redirect, testCase.Redirect, route.Match)
+				}
+			}
 			details = append(details, fmt.Sprintf("PASS input:[%v]", input))
 		}
 		inputCount += len(inputs)

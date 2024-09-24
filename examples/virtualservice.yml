@@ -1,4 +1,4 @@
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: example
@@ -10,6 +10,12 @@ spec:
     - www.example.com
     - example.com
   http:
+    - match:
+      - uri:
+          prefix: /home
+      redirect:
+        uri: /
+        authority: www.example.com
     - match:
         - uri:
             regex: /users(/.*)?

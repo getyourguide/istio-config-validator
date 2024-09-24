@@ -66,11 +66,15 @@ testCases:
 Have a look in the [TestCase Reference](docs/test-cases.md) to learn more how to define the tests.
 
 ## Installation
+
 Either install the go package
+
 ```
 # go install github.com/getyourguide/istio-config-validator/cmd/istio-config-validator@latest
 ```
+
 Or alternatively install the docker image
+
 ```
 # docker pull getyourguide/istio-config-validator:latest
 ```
@@ -115,16 +119,14 @@ If you're interested in contributing to this project or running a dev version, h
 
 The API for test cases does not cover all aspects of VirtualServices.
 
--   Supported [HTTPMatchRequests](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPMatchRequest) fields to match requests against are: `authority`, `method`, `headers` and `uri`.
-    -   Not supported ones: `scheme`, `port`, `queryParams`, etc.
+- Supported [HTTPMatchRequests](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPMatchRequest) fields to match requests against are: `authority`, `method`, `headers` and `uri`.
+  - Not supported ones: `scheme`, `port`, `queryParams`, etc.
 
--   Supported assert against [HTTPRouteDestination](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRouteDestination) and [HTTPRewrite](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRewrite)
-    -   Not supported ones: [HTTPRedirect](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRedirect), etc.
+- Supported assert against [HTTPRouteDestination](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRouteDestination), [HTTPRewrite](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRewrite), [HTTPFaultInjection](https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPFaultInjection), [Headers](https://istio.io/latest/docs/reference/config/networking/virtual-service/#Headers), [Delegate](https://istio.io/latest/docs/reference/config/networking/virtual-service/#Delegate) and [HTTPRedirect](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRedirect).
 
 ## Security
 
 For sensitive security matters please contact [security@getyourguide.com](mailto:security@getyourguide.com).
-
 
 ## Legal
 

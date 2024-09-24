@@ -26,9 +26,7 @@ func TestParseVirtualServices(t *testing.T) {
 }
 
 func TestParseMultipleVirtualServices(t *testing.T) {
-	expectedTestCases := []*v1alpha3.VirtualService{{Spec: networkingv1alpha3.VirtualService{
-		Hosts: []string{"www.example.com", "example.com"},
-	}}}
+	wantHosts := []string{"www.example2.com", "example2.com", "www.example3.com", "example3.com"}
 
 	configfiles := []string{"../../../examples/multidocument_virtualservice.yml"}
 	virtualServices, err := ParseVirtualServices(configfiles)
@@ -36,11 +34,11 @@ func TestParseMultipleVirtualServices(t *testing.T) {
 	require.NotEmpty(t, virtualServices)
 	require.GreaterOrEqual(t, len(virtualServices), 2)
 
-	for _, expected := range expectedTestCases {
-		for _, out := range virtualServices {
-			assert.ElementsMatch(t, expected.Spec.Hosts, out.Spec.Hosts)
-		}
+	var gotHosts []string
+	for _, vs := range virtualServices {
+		gotHosts = append(gotHosts, vs.Spec.Hosts...)
 	}
+	require.ElementsMatch(t, wantHosts, gotHosts)
 }
 
 func TestVirtualServiceUnknownFields(t *testing.T) {
