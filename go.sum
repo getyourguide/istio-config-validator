@@ -858,6 +858,8 @@ honnef.co/go/tools v0.0.0-20190106161140-3f1c8253044a/go.mod h1:rf3lG4BRIbNafJWh
 honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 istio.io/api v1.23.0-alpha.0 h1:KxIso/LLyshEtvhCkTPmcTBQacAH0r9sOhjOo4/e34U=
 istio.io/api v1.23.0-alpha.0/go.mod h1:QPSTGXuIQdnZFEm3myf9NZ5uBMwCdJWUvfj9ZZ+2oBM=
+istio.io/api v1.23.2 h1:FvWi7GC+rWD60/ZFPuulX/h3k+f2Q9qot3dP8CIL8Ss=
+istio.io/api v1.23.2/go.mod h1:QPSTGXuIQdnZFEm3myf9NZ5uBMwCdJWUvfj9ZZ+2oBM=
 istio.io/client-go v1.22.3 h1:4WocGQYVTASpfn7tj1yGE8f0sgxzbxOkg56HX1LJQ5U=
 istio.io/client-go v1.22.3/go.mod h1:D/vNne1n5586423NgGXMnPgshE/99mQgnjnxK/Vw2yM=
 istio.io/istio v0.0.0-20240702012549-b64a2f6240c6 h1:fY1uBYYfXbTXBwwifqwV+Rq87AFEIM6YGxyNPc8b+/g=
