@@ -8,10 +8,10 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v1.23.2
-	istio.io/client-go v1.23.2
+	istio.io/api v1.23.3
+	istio.io/client-go v1.23.3
 	istio.io/istio v0.0.0-20240801200413-240c47f2b444
-	k8s.io/apimachinery v0.31.1
+	k8s.io/apimachinery v0.31.2
 )
 
 require (
