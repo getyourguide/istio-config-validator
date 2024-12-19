@@ -34,4 +34,4 @@ jobs:
         file: hack/istio-router-check/Dockerfile
         context: .
         push: true
-        tags: getyourguide/istio-router-check:release-1.22
+        tags: getyourguide/istio-router-check:release-1.24

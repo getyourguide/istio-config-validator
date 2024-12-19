@@ -13,7 +13,7 @@ Generate routes and consolidate tests:
 ```shell
 $ docker run \
   -v $(pwd)/examples:/examples \
-  --rm docker.io/getyourguide/istio-router-check:release-1.22 --config-dir /examples/virtualservices --test-dir examples/envoy-tests/ -o examples/build/
+  --rm docker.io/getyourguide/istio-router-check:release-1.24 --config-dir /examples/virtualservices --test-dir examples/envoy-tests/ -o examples/build/
 
 time=2024-07-09T13:41:43.137Z level=INFO msg="reading tests" dir=examples/envoy-tests/
 time=2024-07-09T13:41:43.145Z level=INFO msg="writing tests" file=examples/build/tests.json
@@ -27,7 +27,7 @@ Run envoy route table check tool using the generated files.
 docker run \
   -v $(pwd)/examples:/examples \
   --entrypoint=/usr/local/bin/router_check_tool \
-  --rm docker.io/getyourguide/istio-router-check:release-1.22 \
+  --rm docker.io/getyourguide/istio-router-check:release-1.24 \
   -c /examples/build/route_sidecar_80.json -t /examples/build/tests.json --only-show-failures --disable-deprecation-check
 
 Current route coverage: 50%
@@ -37,7 +37,7 @@ Current route coverage: 50%
 
 ```shell
 docker run \
-  --rm docker.io/getyourguide/istio-router-check:release-1.22 -h
+  --rm docker.io/getyourguide/istio-router-check:release-1.24 -h
 
 Usage:
   istio-router-check [flags]
@@ -56,7 +56,7 @@ Envoy Router Check
 ```shell
 docker run \
   --entrypoint=/usr/local/bin/router_check_tool
-  --rm docker.io/getyourguide/istio-router-check:release-1.22 -h
+  --rm docker.io/getyourguide/istio-router-check:release-1.24 -h
 
 
 USAGE:
