@@ -5,13 +5,13 @@ go 1.23.4
 require (
 	github.com/envoyproxy/go-control-plane v0.13.2-0.20241022220226-23b7e55d7f65
 	github.com/go-logr/logr v1.4.2
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v1.24.2
-	istio.io/client-go v1.24.2
+	istio.io/api v1.24.3
+	istio.io/client-go v1.24.3
 	istio.io/istio v0.0.0-20241025185149-14bf1bd58ad1
-	k8s.io/apimachinery v0.32.1
+	k8s.io/apimachinery v0.32.2
 )
 
 require (
@@ -107,7 +107,7 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/cast v1.7.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/vbatts/tar-split v0.11.5 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
