@@ -3,7 +3,7 @@ module github.com/getyourguide/istio-config-validator
 go 1.23.4
 
 require (
-	github.com/envoyproxy/go-control-plane v0.13.2-0.20241022220226-23b7e55d7f65
+	github.com/envoyproxy/go-control-plane v0.13.4
 	github.com/go-logr/logr v1.4.2
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
