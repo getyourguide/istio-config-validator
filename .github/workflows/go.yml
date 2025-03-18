@@ -10,7 +10,6 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.23.x]
         platform: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -19,7 +18,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version-file: go.mod
       - name: Environment information
         run: |
           uname -a
