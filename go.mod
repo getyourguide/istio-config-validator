@@ -3,13 +3,13 @@ module github.com/getyourguide/istio-config-validator
 go 1.24
 
 require (
-	github.com/envoyproxy/go-control-plane/envoy v1.32.5-0.20250324143336-b136b6a9ca11
+	github.com/envoyproxy/go-control-plane/envoy v1.32.5-0.20250330162619-f5bf58766a1b
 	github.com/go-logr/logr v1.4.2
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	gopkg.in/yaml.v3 v3.0.1
-	istio.io/api v1.25.0
-	istio.io/client-go v1.25.0
+	istio.io/api v1.25.1
+	istio.io/client-go v1.25.1
 	istio.io/istio v0.0.0-20250318001239-a029fe974ba4
 	k8s.io/apimachinery v0.32.3
 )
@@ -135,7 +135,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20250122153221-138b5a5a4fd4 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250122153221-138b5a5a4fd4 // indirect
 	google.golang.org/grpc v1.71.0 // indirect
-	google.golang.org/protobuf v1.36.5 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
