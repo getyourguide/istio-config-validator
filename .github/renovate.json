@@ -1,6 +1,7 @@
 {
   "extends": ["config:base", ":disableDependencyDashboard"],
   "enabledManagers": ["gomod"],
+  "labels": ["dependencies"],
   "postUpdateOptions": ["gomodUpdateImportPaths", "gomodMassage", "gomodTidy"],
   "automergeSchedule": ["after 9am and before 6pm every weekday"],
   "packageRules": [
