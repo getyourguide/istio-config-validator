@@ -1,4 +1,4 @@
-# This file is to test skiping non virtual services files
+# This file is to test skipping non virtual services files
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:

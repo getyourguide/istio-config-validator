@@ -45,7 +45,7 @@ func Run(testfiles, configfiles []string, strict bool) ([]string, []string, erro
 				if testCase.Delegate != nil {
 					if reflect.DeepEqual(route.Delegate, testCase.Delegate) != testCase.WantMatch {
 						details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-						return summary, details, fmt.Errorf("delegate missmatch=%v, want %v, rule matched: %v", route.Delegate, testCase.Delegate, route.Match)
+						return summary, details, fmt.Errorf("delegate mismatch=%v, want %v, rule matched: %v", route.Delegate, testCase.Delegate, route.Match)
 					}
 					details = append(details, fmt.Sprintf("PASS input:[%v]", input))
 				}
@@ -66,31 +66,31 @@ func Run(testfiles, configfiles []string, strict bool) ([]string, []string, erro
 			if testCase.Route != nil {
 				if reflect.DeepEqual(route.Route, testCase.Route) != testCase.WantMatch {
 					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-					return summary, details, fmt.Errorf("destination missmatch=%v, want %v, rule matched: %v", route.Route, testCase.Route, route.Match)
+					return summary, details, fmt.Errorf("destination mismatch=%v, want %v, rule matched: %v", route.Route, testCase.Route, route.Match)
 				}
 			}
 			if testCase.Rewrite != nil {
 				if reflect.DeepEqual(route.Rewrite, testCase.Rewrite) != testCase.WantMatch {
 					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-					return summary, details, fmt.Errorf("rewrite missmatch=%v, want %v, rule matched: %v", route.Rewrite, testCase.Rewrite, route.Match)
+					return summary, details, fmt.Errorf("rewrite mismatch=%v, want %v, rule matched: %v", route.Rewrite, testCase.Rewrite, route.Match)
 				}
 			}
 			if testCase.Fault != nil {
 				if reflect.DeepEqual(route.Fault, testCase.Fault) != testCase.WantMatch {
 					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-					return summary, details, fmt.Errorf("fault missmatch=%v, want %v, rule matched: %v", route.Fault, testCase.Fault, route.Match)
+					return summary, details, fmt.Errorf("fault mismatch=%v, want %v, rule matched: %v", route.Fault, testCase.Fault, route.Match)
 				}
 			}
 			if testCase.Headers != nil {
 				if reflect.DeepEqual(route.Headers, testCase.Headers) != testCase.WantMatch {
 					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-					return summary, details, fmt.Errorf("headers missmatch=%v, want %v, rule matched: %v", route.Headers, testCase.Headers, route.Match)
+					return summary, details, fmt.Errorf("headers mismatch=%v, want %v, rule matched: %v", route.Headers, testCase.Headers, route.Match)
 				}
 			}
 			if testCase.Redirect != nil {
 				if reflect.DeepEqual(route.Redirect, testCase.Redirect) != testCase.WantMatch {
 					details = append(details, fmt.Sprintf("FAIL input:[%v]", input))
-					return summary, details, fmt.Errorf("redirect missmatch=%v, want %v, rule matched: %v", route.Redirect, testCase.Redirect, route.Match)
+					return summary, details, fmt.Errorf("redirect mismatch=%v, want %v, rule matched: %v", route.Redirect, testCase.Redirect, route.Match)
 				}
 			}
 			details = append(details, fmt.Sprintf("PASS input:[%v]", input))
