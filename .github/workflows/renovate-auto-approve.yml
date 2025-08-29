@@ -18,7 +18,7 @@ jobs:
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{ secrets.GYGROBOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GYGROBOT_WRITE_TOKEN }}
       - name: auto-merge Dependabot PRs
         if: ${{ github.actor == 'dependabot[bot]' }}
         run: gh pr merge --auto --squash "$PR_URL"
