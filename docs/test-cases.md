@@ -4,7 +4,7 @@ This document describes how one can define test cases to be used by the testing 
 
 ## TestCases
 
-Test cases objects are interpreted by the framework to build up the mock and run the tests agaisnt the configuration.
+Test cases objects are interpreted by the framework to build up the mock and run the tests against the configuration.
 
 | Field     | Type                    | Description                |
 |-----------|-------------------------|----------------------------|

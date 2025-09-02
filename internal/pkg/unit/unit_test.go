@@ -42,7 +42,7 @@ func TestGetRoute(t *testing.T) {
 		{
 			name: "no host match, empty destination",
 			args: args{
-				input: parser.Input{Authority: "www.exemple.com", URI: "/"},
+				input: parser.Input{Authority: "www.example.com", URI: "/"},
 				virtualServices: []*v1.VirtualService{{
 					Spec: networking.VirtualService{
 						Hosts: []string{"www.another-example.com"},

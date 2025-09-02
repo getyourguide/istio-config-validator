@@ -113,7 +113,7 @@ func TestUnfoldRequest(t *testing.T) {
 			nil,
 		},
 		{
-			"multiple authorites and single method and URI",
+			"multiple authorities and single method and URI",
 			Request{
 				Authority: []string{"www.example.com", "example.com", "foo.bar"},
 				Method:    []string{"GET"},
