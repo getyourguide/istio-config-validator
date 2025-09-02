@@ -8,7 +8,7 @@
     {
       "schedule": ["after 9am and before 6pm on monday"],
       "automerge": true,
-      "groupName": "Go minor dependencies updates (auto-merge)",
+      "groupName": "Go minor dependencies updates",
       "updateTypes": ["minor", "patch", "digest", "pin", "pinDigest"]
     },
     {
