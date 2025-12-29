@@ -22,7 +22,7 @@ func ParseVirtualServices(files []string) ([]*v1.VirtualService, error) {
 			return nil, fmt.Errorf("failed to parse CRD %q: %w", file, err)
 		}
 		for _, c := range configs {
-			if c.Meta.GroupVersionKind != gvk.VirtualService {
+			if c.GroupVersionKind != gvk.VirtualService {
 				continue
 			}
 			spec, ok := c.Spec.(*networking.VirtualService)

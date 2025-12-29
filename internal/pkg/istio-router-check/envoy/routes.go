@@ -102,21 +102,21 @@ func (rg *routeGenerator) prepareProxy() error {
 	}
 	var gatewayFound bool
 	for _, cfg := range rg.configs {
-		if cfg.Meta.GroupVersionKind != gvk.Gateway {
+		if cfg.GroupVersionKind != gvk.Gateway {
 			continue
 		}
-		if cfg.Meta.Name == namespacedName.Name && cfg.Meta.Namespace == namespacedName.Namespace {
+		if cfg.Name == namespacedName.Name && cfg.Namespace == namespacedName.Namespace {
 			gatewayFound = true
 			var selector map[string]string
 			switch v := cfg.Spec.(type) {
 			case *v1.Gateway:
 				selector = v.Selector
 			default:
-				return fmt.Errorf("could not cast Gateway spec (%T) for %s/%s", v, cfg.Meta.Namespace, cfg.Meta.Name)
+				return fmt.Errorf("could not cast Gateway spec (%T) for %s/%s", v, cfg.Namespace, cfg.Name)
 			}
 
 			metadata = &model.NodeMetadata{
-				Namespace: cfg.Meta.Namespace,
+				Namespace: cfg.Namespace,
 				Labels:    selector,
 			}
 			break

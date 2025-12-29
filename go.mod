@@ -1,6 +1,6 @@
 module github.com/getyourguide/istio-config-validator
 
-go 1.24.2
+go 1.25.4
 
 require (
 	github.com/envoyproxy/go-control-plane/envoy v1.32.5-0.20250825055304-c16cefd5ef4e
