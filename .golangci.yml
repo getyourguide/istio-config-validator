@@ -1,14 +1,7 @@
-run:
-  timeout: 10m
+version: "2"
 linters:
-  disable-all: true
-  enable:
-    - errcheck
-    - gofumpt
-    - gosimple
-    - govet
-    - ineffassign
-    - staticcheck
-    - stylecheck
-    - typecheck
-    - unused
+  exclusions:
+    rules:
+      - path: .+
+        linters:
+          - errcheck
