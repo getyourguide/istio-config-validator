@@ -1,27 +1,5 @@
-# File managed by getyourguide/k8s-tools
 version: 2
-registries:
-  docker-registry-130607246975-dkr-ecr-eu-central-1-amazonaws-com:
-    type: docker-registry
-    url: https://130607246975.dkr.ecr.eu-central-1.amazonaws.com
-    username: "${{ secrets.DOCKER_REGISTRY_130607246975_DKR_ECR_EU_CENTRAL_1_AMAZONAWS_COM_USERNAME }}"
-    password: "${{ secrets.DOCKER_REGISTRY_130607246975_DKR_ECR_EU_CENTRAL_1_AMAZONAWS_COM_PASSWORD }}"
-  docker-registry-890546402176-dkr-ecr-eu-central-1-amazonaws-com:
-    type: docker-registry
-    url: https://890546402176.dkr.ecr.eu-central-1.amazonaws.com
-    username: "${{ secrets.DOCKER_REGISTRY_890546402176_DKR_ECR_EU_CENTRAL_1_AMAZONAWS_COM_USERNAME }}"
-    password: "${{ secrets.DOCKER_REGISTRY_890546402176_DKR_ECR_EU_CENTRAL_1_AMAZONAWS_COM_PASSWORD }}"
 updates:
-  - package-ecosystem: docker
-    directory: /
-    schedule:
-      interval: weekly
-      day: monday
-      time: "13:00"
-      timezone: Europe/Berlin
-    registries:
-      - docker-registry-890546402176-dkr-ecr-eu-central-1-amazonaws-com
-      - docker-registry-130607246975-dkr-ecr-eu-central-1-amazonaws-com
   - package-ecosystem: github-actions
     directory: /
     schedule:
