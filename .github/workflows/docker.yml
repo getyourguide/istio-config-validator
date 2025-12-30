@@ -28,13 +28,13 @@ jobs:
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
       - name: Build and push docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: getyourguide/istio-config-validator:latest
 
       - name: Build and push istio-router-check
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           pull: true
           file: hack/istio-router-check/Dockerfile
