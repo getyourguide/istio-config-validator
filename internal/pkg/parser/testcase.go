@@ -21,6 +21,8 @@ var (
 	ErrEmptyMethodList = errors.New("method list is empty")
 	// ErrEmptyURIList indicates an empty URI list
 	ErrEmptyURIList = errors.New("URI list is empty")
+	// ErrRouteRequiredWhenWantMatchFalse indicates missing route when wantMatch is false
+	ErrRouteRequiredWhenWantMatchFalse = errors.New("route must be provided")
 )
 
 // TestCaseYAML define the list of TestCase
@@ -139,7 +141,12 @@ func ParseTestCases(files []string, strict bool) ([]*TestCase, error) {
 				return nil, fmt.Errorf("unmarshaling failed for file %q: %w", file, err)
 			}
 
-			out = append(out, yamlFile.TestCases...)
+			for _, tc := range yamlFile.TestCases {
+				if tc.Route == nil || len(tc.Route) == 0 {
+					return nil, fmt.Errorf("validation failed for file %q test case %q: %w", file, tc.Description, ErrRouteRequiredWhenWantMatchFalse)
+				}
+				out = append(out, tc)
+			}
 		}
 	}
 	return out, nil

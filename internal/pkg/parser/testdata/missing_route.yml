@@ -1,0 +1,14 @@
+testCases:
+  - description: wantMatch false requires route
+    wantMatch: false
+    request:
+      authority: ["example.com"]
+      method: ["GET"]
+      uri: ["/"]
+
+  - description: wantMatch true requires route
+    wantMatch: true
+    request:
+      authority: ["example.com"]
+      method: ["GET"]
+      uri: ["/"]
