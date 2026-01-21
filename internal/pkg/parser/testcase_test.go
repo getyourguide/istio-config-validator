@@ -19,7 +19,7 @@ func TestUnknownField(t *testing.T) {
 func TestParseTestCasesRequiresRouteWhenWantMatchIsFalse(t *testing.T) {
 	testsFiles := []string{"testdata/missing_route.yml"}
 	_, err := ParseTestCases(testsFiles, false)
-	require.ErrorIs(t, err, ErrRouteRequiredWhenWantMatchFalse)
+	require.ErrorIs(t, err, ErrRouteRequiredForSimpleRouting)
 }
 
 func TestParseTestCases(t *testing.T) {

@@ -21,8 +21,8 @@ var (
 	ErrEmptyMethodList = errors.New("method list is empty")
 	// ErrEmptyURIList indicates an empty URI list
 	ErrEmptyURIList = errors.New("URI list is empty")
-	// ErrRouteRequiredWhenWantMatchFalse indicates missing route when wantMatch is false
-	ErrRouteRequiredWhenWantMatchFalse = errors.New("route must be provided")
+	// ErrRouteRequiredForSimpleRouting indicates missing route when wantMatch is false
+	ErrRouteRequiredForSimpleRouting = errors.New("route must be provided when using simple routing")
 )
 
 // TestCaseYAML define the list of TestCase
@@ -142,8 +142,8 @@ func ParseTestCases(files []string, strict bool) ([]*TestCase, error) {
 			}
 
 			for _, tc := range yamlFile.TestCases {
-				if tc.Route == nil || len(tc.Route) == 0 {
-					return nil, fmt.Errorf("validation failed for file %q test case %q: %w", file, tc.Description, ErrRouteRequiredWhenWantMatchFalse)
+				if tc.Rewrite == nil && tc.Redirect == nil && tc.Delegate == nil && len(tc.Route) == 0 {
+					return nil, fmt.Errorf("validation failed for file %q test case %q: %w", file, tc.Description, ErrRouteRequiredForSimpleRouting)
 				}
 				out = append(out, tc)
 			}
