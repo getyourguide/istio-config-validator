@@ -11,7 +11,7 @@ require (
 	istio.io/api v1.30.0-rc.0
 	istio.io/client-go v1.30.0-rc.0
 	istio.io/istio v0.0.0-20260414012603-10ae2d6caadf
-	k8s.io/apimachinery v0.36.0
+	k8s.io/apimachinery v0.36.1
 )
 
 require (
@@ -151,7 +151,7 @@ require (
 	k8s.io/client-go v0.35.3 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20260317180543-43fb72c5454a // indirect
-	k8s.io/streaming v0.36.0 // indirect
+	k8s.io/streaming v0.36.1 // indirect
 	k8s.io/utils v0.0.0-20260319190234-28399d86e0b5 // indirect
 	sigs.k8s.io/gateway-api v1.4.1 // indirect
 	sigs.k8s.io/gateway-api-inference-extension v1.4.0 // indirect
