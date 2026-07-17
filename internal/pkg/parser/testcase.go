@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	yamlV3 "gopkg.in/yaml.v3"
+	yamlV3 "go.yaml.in/yaml/v4"
 	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
 )
 

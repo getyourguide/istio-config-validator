@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/getyourguide/istio-config-validator/internal/pkg/istio-router-check/helpers"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 type Tests struct {
