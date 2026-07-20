@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
       - name: Install Go
-        uses: actions/setup-go@v6.4.0
+        uses: actions/setup-go@v6.5.0
         with:
           go-version-file: go.mod
       - name: Environment information
