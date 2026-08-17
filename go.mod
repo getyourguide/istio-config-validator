@@ -6,7 +6,7 @@ require (
 	github.com/envoyproxy/go-control-plane/envoy v1.37.1-0.20260425030550-64b2e46d9ebf
 	github.com/go-logr/logr v1.4.4
 	github.com/spf13/cobra v1.10.2
-	github.com/stretchr/testify v1.11.1
+	github.com/stretchr/testify v1.12.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
 	istio.io/api v1.30.3
 	istio.io/client-go v1.30.3
